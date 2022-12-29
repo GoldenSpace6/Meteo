@@ -12,7 +12,7 @@ sort="avl"
 #g=0
 #a=0
 
-while getopts "f:t:p:whmFGSAOQ-:" option; do
+while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
         f)
             if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ] #csv
@@ -20,30 +20,22 @@ while getopts "f:t:p:whmFGSAOQ-:" option; do
                 echo wrong file
                 exit 1
             fi
-            file=${OPTARG}
-            ;;
+            file=${OPTARG};;
         t)
-            echo ${OPTARG}
-            t=${OPTARG}
+            t=${OPTARG};;
             #((t == 15 || t == 75)) || echo lol
-            ;;
         p)
-            p=${OPTARG}
-            ;;
+            p=${OPTARG};;
         w)
-            w=1
-            ;;
+            w=1;;
         h)
-            h=1
-            ;;
+            h=1;;
         m)
-            m=1
-            ;;
+            m=1;;
         F | G | S | A | O | Q)
-            region=${option}
-            ;;
+            region=${option};;
         d)
-            ;;
+            d=${OPTARG};;
         -)
             case "${OPTARG}" in
                 help)
@@ -59,7 +51,7 @@ while getopts "f:t:p:whmFGSAOQ-:" option; do
             esac
             ;;
         *)
-            echo Wrong Argument on -${OPTARG}
+            echo Wrong Argument on ${option}
             ;;
     esac
 done
