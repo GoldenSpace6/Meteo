@@ -15,9 +15,9 @@ sort="avl"
 while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
         f)
-            if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ] #csv
+            if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ]
             then
-                echo wrong file
+                echo Wrong file, use --help
                 exit 1
             fi
             file=${OPTARG};;
@@ -40,26 +40,32 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
             case "${OPTARG}" in
                 help)
                     echo try random thing, it might work
-                    exit 0
-                    ;;
+                    exit 0;;
                 tab | avl | abr)
-                    sort=${OPTARG}
-                    ;;
+                    sort=${OPTARG};;
                 *)
-                    echo Wrong Argument on -${OPTARG}
-                    ;;
-            esac
-            ;;
+                    echo Wrong Argument on -${OPTARG}, use --help
+                    exit 1;;
+            esac;;
         *)
-            echo Wrong Argument on ${option}
-            ;;
+            echo Wrong Argument on ${option}, use --help
+            exit 1;;
     esac
 done
 #shift $((OPTIND-1))
-echo "p = ${p}
-t = ${t}
-h = ${h}
-w = ${w}
-m = ${m}
-region = ${region}
-sort = ${sort}"
+if [ -z $file ]; then
+    echo Missing file, use --help
+    exit 2
+fi
+if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
+    echo Missing Argument, use --help
+    exit 2
+fi
+echo "file = $file"
+echo "p = $p"
+echo "t = $t"
+echo "h = $h"
+echo "w = $w"
+echo "m = $m"
+echo "region = $region"
+echo "sort = $sort"
