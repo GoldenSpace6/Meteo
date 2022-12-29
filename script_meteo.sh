@@ -17,19 +17,19 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
         f) #File
             if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ]
             then
-                echo Wrong file, use --help
+                echo "File must be a csv"
                 exit 1
             fi
             file=${OPTARG};;
         t) #Temperature
             if [ $OPTARG -ne 1 ] && [ $OPTARG -ne 2 ] && [ $OPTARG -ne 3 ]; then
-                echo -t argument must be 1,2 or 3, use --help
+                echo "Temperature argument must be 1,2 or 3, use --help"
                 exit 1
             fi
             t=${OPTARG};;
         p) #Pressure
             if [ $OPTARG -ne 1 ] && [ $OPTARG -ne 2 ] && [ $OPTARG -ne 3 ]; then
-                echo -p argument must be 1,2 or 3, use --help
+                echo "Pressure argument must be 1,2 or 3, use --help"
                 exit 1
             fi
             p=${OPTARG};;
@@ -42,6 +42,10 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
         F | G | S | A | O | Q) #Region
             region=${option};;
         d) #Date
+            if [ ! ${OPTARG} -ne ????-??-??,????-??-?? ];then
+                echo "Date argument must be in format YYYY-MM-DD,YYYY-MM-DD"
+                exit 1
+            fi
             d=${OPTARG};;
         -)
             case "${OPTARG}" in
@@ -53,21 +57,21 @@ exit 2 > missing option"
                     
                     sort=${OPTARG};;
                 *)
-                    echo Wrong option on --${OPTARG}, use --help
+                    echo "Wrong option on --${OPTARG}, use --help"
                     exit 1;;
             esac;;
         *)
-            echo Wrong option on ${option}, use --help
+            echo "Wrong option on ${option}, use --help"
             exit 1;;
     esac
 done
 #shift $((OPTIND-1))
 if [ -z $file ]; then
-    echo Missing file, use --help
+    echo "Missing file, use -f" 
     exit 2
 fi
 if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
-    echo Missing option -p -t -w -h or -m, use --help
+    echo "Missing option -p -t -w -h or -m, use --help"
     exit 2
 fi
 echo "file = $file"
