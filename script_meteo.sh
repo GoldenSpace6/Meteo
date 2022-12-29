@@ -14,41 +14,50 @@ sort="avl"
 
 while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
-        f)
+        f) #File
             if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ]
             then
                 echo Wrong file, use --help
                 exit 1
             fi
             file=${OPTARG};;
-        t)
+        t) #Temperature
+            if [ $OPTARG -ne 1 ] && [ $OPTARG -ne 2 ] && [ $OPTARG -ne 3 ]; then
+                echo -t argument must be 1,2 or 3, use --help
+                exit 1
+            fi
             t=${OPTARG};;
-            #((t == 15 || t == 75)) || echo lol
-        p)
+        p) #Pressure
+            if [ $OPTARG -ne 1 ] && [ $OPTARG -ne 2 ] && [ $OPTARG -ne 3 ]; then
+                echo -p argument must be 1,2 or 3, use --help
+                exit 1
+            fi
             p=${OPTARG};;
-        w)
+        w) #Wind
             w=1;;
-        h)
+        h) #Height
             h=1;;
-        m)
+        m) #Humidity
             m=1;;
-        F | G | S | A | O | Q)
+        F | G | S | A | O | Q) #Region
             region=${option};;
-        d)
+        d) #Date
             d=${OPTARG};;
         -)
             case "${OPTARG}" in
-                help)
-                    echo try random thing, it might work
+                help) #Help
+                    echo "exit 1 > inpropper use of option
+exit 2 > missing option"
                     exit 0;;
-                tab | avl | abr)
+                tab | avl | abr) #Sorting Algorithme
+                    
                     sort=${OPTARG};;
                 *)
-                    echo Wrong Argument on -${OPTARG}, use --help
+                    echo Wrong option on --${OPTARG}, use --help
                     exit 1;;
             esac;;
         *)
-            echo Wrong Argument on ${option}, use --help
+            echo Wrong option on ${option}, use --help
             exit 1;;
     esac
 done
@@ -58,7 +67,7 @@ if [ -z $file ]; then
     exit 2
 fi
 if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
-    echo Missing Argument, use --help
+    echo Missing option -p -t -w -h or -m, use --help
     exit 2
 fi
 echo "file = $file"
