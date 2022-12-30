@@ -4,20 +4,23 @@ t=0
 h=0
 m=0
 w=0
-region=0
 sort="avl"
-#dmin=0
-#dmax=0
-
 #g=0
 #a=0
 
+OIFS=$IFS
+
+# ---- Checking and saving option ----
 while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
         f) #File
-            if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ]
-            then
+            echo ${OPTARG}
+            if [ ! -f ${OPTARG} ] || [[ ${OPTARG} != *.csv ]]; then 
                 echo "File must exist and be a csv"
+                exit 1
+            fi
+            if [ ! -r "${OPTARG}" ]; then
+                echo "File is not readable"
                 exit 1
             fi
             file=${OPTARG};;
@@ -64,7 +67,7 @@ exit 2 > missing option"
             exit 1;;
     esac
 done
-echo $OPTIND
+#echo $OPTIND
 #shift $((OPTIND-1))
 if [ -z $file ]; then
     echo "Missing file, use -f" 
@@ -74,16 +77,29 @@ if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
     echo "Missing option -p -t -w -h or -m, use --help"
     exit 2
 fi
-# ----- Filtering Data -----
-OIFS=$IFS
-IFS=","
-set -- $d
-dmin=$1
-dmax=$2
+
+# ---- Filtering Data ----
+ffile=$file
+if [ ! -z $d ]; then
+    IFS=","
+    set -- $d
+    dmin=$(date -d $1 +%s)
+    dmax=$(date -d $2 +%s)
+    
+    head -n1 $file > filtered_meteo_date.csv
+    IFS=$'\n'
+    for i in $(tail -n+2 $ffile);do
+        set -- $(echo $i | tr ";" "\n")
+        if (( $(date -d $2 +%s) >= $dmin && $(date -d $2 +%s) <= $dmax ));then
+            echo $i >> filtered_meteo_date.csv
+        fi
+    done
+    ffile="filtered_meteo_date.csv"
+fi
+
 IFS=$OIFS
 
-
-echo "file = $file"
+echo "file = $ffile"
 echo "p = $p"
 echo "t = $t"
 echo "h = $h"
