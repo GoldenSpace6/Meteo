@@ -17,7 +17,7 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
         f) #File
             if [ ! -f "${OPTARG}" ] | [ ! *.csv == "${OPTARG}" ]
             then
-                echo "File must be a csv"
+                echo "File must exist and be a csv"
                 exit 1
             fi
             file=${OPTARG};;
@@ -42,7 +42,7 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
         F | G | S | A | O | Q) #Region
             region=${option};;
         d) #Date
-            if [ ! ${OPTARG} -ne ????-??-??,????-??-?? ];then
+            if [[ ${OPTARG} != ????-??-??,????-??-?? ]]; then
                 echo "Date argument must be in format YYYY-MM-DD,YYYY-MM-DD"
                 exit 1
             fi
@@ -54,7 +54,6 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
 exit 2 > missing option"
                     exit 0;;
                 tab | avl | abr) #Sorting Algorithme
-                    
                     sort=${OPTARG};;
                 *)
                     echo "Wrong option on --${OPTARG}, use --help"
@@ -65,6 +64,7 @@ exit 2 > missing option"
             exit 1;;
     esac
 done
+echo $OPTIND
 #shift $((OPTIND-1))
 if [ -z $file ]; then
     echo "Missing file, use -f" 
@@ -74,6 +74,15 @@ if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
     echo "Missing option -p -t -w -h or -m, use --help"
     exit 2
 fi
+# ----- Filtering Data -----
+OIFS=$IFS
+IFS=","
+set -- $d
+dmin=$1
+dmax=$2
+IFS=$OIFS
+
+
 echo "file = $file"
 echo "p = $p"
 echo "t = $t"
@@ -81,4 +90,5 @@ echo "h = $h"
 echo "w = $w"
 echo "m = $m"
 echo "region = $region"
+echo "dmin = $dmin , dmax = $dmax"
 echo "sort = $sort"
