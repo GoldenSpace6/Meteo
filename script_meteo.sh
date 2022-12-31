@@ -5,8 +5,6 @@ h=0
 m=0
 w=0
 sort="avl"
-#g=0
-#a=0
 
 OIFS=$IFS
 # ---- Checking and saving option ----
