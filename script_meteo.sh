@@ -93,17 +93,17 @@ if [ -n "$d" ] || [ -n "$region" ];then
             # Create a Area that contain the whole region
             # [minLatitude,maxLatitude,minLongitude,maxLongitude]
             F)
-                Area=(-100 100 -200 200);;
+                Area=(38.5 51.5 -6.5 10.5);;
             G)
-                Area=(1 1 1 1);;
+                Area=(1.5 7 -55.5 -51);;
             S)
-                Area=(1 1 1 1);;
+                Area=(46 48 -58 -54);;
             A)
-                Area=(1 1 1 1);;
+                Area=(9 29 -92 -55);;
             O)
-                Area=(1 1 1 1);;
+                Area=(-60 7 20 120);;
             Q)
-                Area=(1 1 1 1);;
+                Area=(-90 -60 -180 180);;
             *)
                 echo Error Wrong region
                 exit 1
