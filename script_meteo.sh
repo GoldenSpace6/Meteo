@@ -9,7 +9,6 @@ sort="avl"
 #a=0
 
 OIFS=$IFS
-
 # ---- Checking and saving option ----
 while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
@@ -80,21 +79,68 @@ fi
 
 # ---- Filtering Data ----
 ffile=$file
-if [ ! -z $d ]; then
-    IFS=","
-    set -- $d
-    dmin=$(date -d $1 +%s)
-    dmax=$(date -d $2 +%s)
-    
-    head -n1 $file > filtered_meteo_date.csv
+if [ -n "$d" ] || [ -n "$region" ];then
+    #Date
+    if [ -n "$d" ]; then
+        IFS=","
+        set -- $d
+        dmin=$(date -d $1 +%s)
+        dmax=$(date -d $2 +%s)
+    fi
+    #Region
+    if [ -n "$region" ]; then
+        case $region in
+            # Create a Area that contain the whole region
+            # [minLatitude,maxLatitude,minLongitude,maxLongitude]
+            F)
+                Area=(-100 100 -200 200);;
+            G)
+                Area=(1 1 1 1);;
+            S)
+                Area=(1 1 1 1);;
+            A)
+                Area=(1 1 1 1);;
+            O)
+                Area=(1 1 1 1);;
+            Q)
+                Area=(1 1 1 1);;
+            *)
+                echo Error Wrong region
+                exit 1
+        esac
+    fi
+
+    head -n1 $file > filtered_meteo.csv
     IFS=$'\n'
     for i in $(tail -n+2 $ffile);do
-        set -- $(echo $i | tr ";" "\n")
-        if (( $(date -d $2 +%s) >= $dmin && $(date -d $2 +%s) <= $dmax ));then
-            echo $i >> filtered_meteo_date.csv
+        IFS=$';'
+        set -- $i
+        #echo "$1 ; $2 ; $3 ; $4 ; $5 ; $6 ; $7 ; $8 ; $9 ; ${10}"
+        save=1
+        #Date
+        if [ -n "$d" ]; then
+            tempdate=`date -d $2 +%s`
+            if (( $tempdate < $dmin || $tempdate > $dmax )); then
+                save=0
+            fi
+        fi
+        #Region
+        if [ -n "$region" ] && [ $save -eq 1 ]; then
+            GPS=(${10//,/;}) #replace , by ; then turn it into an array
+            temp1=`echo "${GPS[0]}<${Area[0]}" | bc`
+            temp2=`echo "${GPS[0]}>${Area[1]}" | bc`
+            temp3=`echo "${GPS[1]}<${Area[2]}" | bc`
+            temp4=`echo "${GPS[1]}>${Area[3]}" | bc`
+            if (( $temp1 || $temp2 || $temp3 || $temp4 )); then
+                save=0
+            fi
+        fi
+        #Write on temporary file
+        if [ $save -eq 1 ]; then
+            echo $i >> filtered_meteo.csv
         fi
     done
-    ffile="filtered_meteo_date.csv"
+    ffile="filtered_meteo.csv"
 fi
 
 IFS=$OIFS
