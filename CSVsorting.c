@@ -15,14 +15,16 @@ int i;
 for (i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-f") == 0) {
         if (i + 1 < argc) {
-            input_file = argv[i + 1];
+			i+=1;
+            input_file = argv[i];
         } else {
             fprintf(stderr, "Error: missing file name after -f option\n");
             return 1;
         }
     } else if (strcmp(argv[i], "-o") == 0) {
         if (i + 1 < argc) {
-            output_file = argv[i + 1];
+			i+=1;
+            output_file = argv[i];
         } else {
             fprintf(stderr, "Error: missing file name after -o option\n");
             return 1;
@@ -88,4 +90,4 @@ for (i = 0; i < n_lines; i++) {
 }
 free(lines);
 
-return 0;
+return 0;}
