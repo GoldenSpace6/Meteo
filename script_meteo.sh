@@ -22,13 +22,14 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
             fi
             file=${OPTARG};;
         t) #Temperature
-            if [ $OPTARG -ne 1 ] && [ $OPTARG -ne 2 ] && [ $OPTARG -ne 3 ]; then
+            if [ $OPTARG != 1 ] && [ $OPTARG != 2 ] && [ $OPTARG != 3 ]; then
                 echo "Temperature argument must be 1,2 or 3, use --help"
                 exit 1
             fi
             t=${OPTARG};;
         p) #Pressure
-            if [ $OPTARG -ne 1 ] && [ $OPTARG -ne 2 ] && [ $OPTARG -ne 3 ]; then
+
+            if [ $OPTARG != 1 ] && [ $OPTARG != 2 ] && [ $OPTARG != 3 ]; then
                 echo "Pressure argument must be 1,2 or 3, use --help"
                 exit 1
             fi
@@ -74,8 +75,85 @@ if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
     echo "Missing option -p -t -w -h or -m, use --help"
     exit 2
 fi
-
 # ---- Filtering Data ----
+#ffile=$file
+#if [ -n "$d" ] || [ -n "$region" ];then
+#    #Date
+#    if [ -n "$d" ]; then
+#        IFS=","
+#        set -- $d
+#        dmin=$(date -d $1 +%s)
+#        dmax=$(date -d $2 +%s)
+#    fi
+#    #Region
+#    if [ -n "$region" ]; then
+#        case $region in
+#            # Create a Area that contain the whole region
+#            # [minLatitude,maxLatitude,minLongitude,maxLongitude]
+#            F)
+#                Area=(38.5 51.5 -6.5 10.5);;
+#            G)
+#                Area=(1.5 7 -55.5 -51);;
+#            S)
+#                Area=(46 48 -58 -54);;
+#            A)
+#                Area=(9 29 -92 -55);;
+#            O)
+#                Area=(-60 7 20 120);;
+#            Q)
+#                Area=(-90 -60 -180 180);;
+#            *)
+#                echo Error Wrong region
+#                exit 1
+#        esac
+#    fi
+#
+#    head -n1 $file > filtered_meteo.csv
+#    IFS=$'\n'
+#    lm=1
+#    ght=0
+#    loop=$(tail -n+2 $ffile)
+#    for i in $loop;do
+#        IFS=";"
+#        HOLA=(${i})
+#
+#        #echo "$1 ; $2 ; $3 ; $4 ; $5 ; $6 ; $7 ; $8 ; $9 ; ${10}"
+#        save=1
+#        lm=$(( lm + 1 ))
+#
+#        if [ $lm -eq "20" ];then
+#            echo $ght
+#            lm=0
+#            ght=$(( ght + 1 ))
+#        fi
+#        
+#        #Date
+#        if [ -n "$d" ]; then
+#            tempdate=`date -d ${HOLA[1]} +%s`
+#            if (( $tempdate < $dmin || $tempdate > $dmax )); then
+#                save=0
+#            fi
+#        fi
+#        #Region
+#        if [ -n "$region" ] && [ $save -eq 1 ]; then
+#            IFS=","
+#            GPS=(${HOLA[9]})
+#            #GPS=(${HOLA[9]//,/$";"})
+#            #GPS=(${10//,/;}) #replace , by ; then turn it into an array
+#            if [ `echo "${GPS[0]}<${Area[0]}||${GPS[0]}>${Area[1]}||${GPS[1]}<${Area[2]}||${GPS[1]}>${Area[3]}" | bc` = 1 ]; then
+#                save=0
+#            fi
+#        fi
+#        #Write on temporary file
+#        if [ $save -eq 1 ]; then
+#            echo $i >> filtered_meteo.csv
+#        fi
+#    done
+#    ffile="filtered_meteo.csv"
+#fi
+
+
+# ---- Filtering Data ---- V2
 ffile=$file
 if [ -n "$d" ] || [ -n "$region" ];then
     #Date
@@ -106,41 +184,10 @@ if [ -n "$d" ] || [ -n "$region" ];then
                 echo Error Wrong region
                 exit 1
         esac
+        awk -F";" 'substr($10,0,index($10,",")-1)-('${Area[0]}')>0 && substr($10,0,index($10,",")-1)-('${Area[1]}')<0 && substr($10,index($10,",")+1,100)-('${Area[2]}')>0 && substr($10,index($10,",")+1,100)-('${Area[3]}')<0 {print $0}' $ffile > filetemp.csv
+        ffile=filetemp.csv
     fi
-
-    head -n1 $file > filtered_meteo.csv
-    IFS=$'\n'
-    for i in $(tail -n+2 $ffile);do
-        IFS=$';'
-        set -- $i
-        #echo "$1 ; $2 ; $3 ; $4 ; $5 ; $6 ; $7 ; $8 ; $9 ; ${10}"
-        save=1
-        #Date
-        if [ -n "$d" ]; then
-            tempdate=`date -d $2 +%s`
-            if (( $tempdate < $dmin || $tempdate > $dmax )); then
-                save=0
-            fi
-        fi
-        #Region
-        if [ -n "$region" ] && [ $save -eq 1 ]; then
-            GPS=(${10//,/;}) #replace , by ; then turn it into an array
-            temp1=`echo "${GPS[0]}<${Area[0]}" | bc`
-            temp2=`echo "${GPS[0]}>${Area[1]}" | bc`
-            temp3=`echo "${GPS[1]}<${Area[2]}" | bc`
-            temp4=`echo "${GPS[1]}>${Area[3]}" | bc`
-            if (( $temp1 || $temp2 || $temp3 || $temp4 )); then
-                save=0
-            fi
-        fi
-        #Write on temporary file
-        if [ $save -eq 1 ]; then
-            echo $i >> filtered_meteo.csv
-        fi
-    done
-    ffile="filtered_meteo.csv"
 fi
-
 IFS=$OIFS
 
 echo "file = $ffile"
