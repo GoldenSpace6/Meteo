@@ -159,10 +159,6 @@ ffile=$file
 #awk -F";" '{print substr( $0, 0, index($0,";")+1 )    substr($0, index(substr($0,0,index($0,";")+2),";")+1, 10000 ) }' meteo_filtered_data_v1.csv
 
 
-awk -F";" '{$2=substr(system("date -d "substr($2,0,10)" +%s"),5,30);print $0}' meteo_filtered_data_v1.csv
-
-awk -F";" '{print $0";"substr(system("date -d "substr($2,0,10)" +%s"),5,30)}' meteo_filtered_data_v1.csv
-
 if [ -n "$d" ] || [ -n "$region" ];then
     #Date
     if [ -n "$d" ]; then
@@ -215,18 +211,34 @@ if [ -n "$d" ] || [ -n "$region" ];then
                 echo Error Wrong region
                 exit 1
         esac
-        dd=$(date -d $5)
-        #awk -F";" -v '{print substr($2,0,10)}' $ffile > filetemp.csv
 
-        #awk -F";" -v date="$(date +%Y-%m-%d)" -v temp="(substr($2,0,10))" '{print temp}' meteo_filtered_data_v1.csv 
+        #awk -F";" '{$2=substr(system("date -d "substr($2,0,10)" +%s"),5,30);print $0}' meteo_filtered_data_v1.csv
 
-        #awk -F";" '{test=substr($2,0,10);print $test}' meteo_filtered_data_v1.csv 
+        #awk -F";" '{print $0";"substr(system("date -d "substr($2,0,10)" +%s"),5,30)}' meteo_filtered_data_v1.csv
     
 
         awk -F";" 'substr($10,0,index($10,",")-1)-('${Area[0]}')>0 && substr($10,0,index($10,",")-1)-('${Area[1]}')<0 && substr($10,index($10,",")+1,100)-('${Area[2]}')>0 && substr($10,index($10,",")+1,100)-('${Area[3]}')<0 {print $0}' $ffile > filetemp.csv
         ffile=filetemp.csv
     fi
 fi
+
+if (($w == 1));then 
+    cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
+fi
+case $t in
+    1)
+        cut $ffile -f1,11,12,13 -d";" > temperature.csv
+        ;;
+    2)
+        cut $ffile -f16,11,12,13 -d";" > temperature.csv
+        ;;
+    3)
+
+    *);;
+esac
+if (($t == 1));then 
+    cut meteo_filtered_data_v1.csv -f1,11,12,13 -d";" > temperature.csv
+
 IFS=$OIFS
 
 echo "file = $ffile"
