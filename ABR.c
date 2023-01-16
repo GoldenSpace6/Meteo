@@ -84,46 +84,7 @@ pArbre suppressionElmt(pArbre a,int e) {
   return a;
 
 }
-int recherche2(pArbre a, int e) {
-  if(estVide(a)) {
-    printf("noeud n'existe pas");
-    return 0;
-  }
-  if(a->val==e) {
-    return 1;
-  }
-  if (a->val>e) {
-    return recherche2(a->fg,e)+1;
-  } else {
-    return recherche2(a->fd,e)+1;
-  }
-}
-int recherche3(pArbre a, int e) {
-  int ret=0;
-  if(estVide(a)==0) {
-    if(a->val==e) {
-      return e;
-    }
-    ret = recherche3(a->fg,e);
-    if(ret != 0) {
-      return ret;
-    }
-    ret = recherche3(a->fd,e);
-  }
-  return ret;
-}
-void minmax(pArbre a,int* min,int* max) {
-  if(a!=NULL) {
-    if(*min > a->val) {
-      *min =a->val;
-    }
-    if(*max < a->val) {
-      *max =a->val;
-    }
-    minmax(a->fg,min,max);
-    minmax(a->fd,min,max);
-  }
-}
+
 pArbre oldMain2() {
   oldMain();
   pArbre temp = NULL;
