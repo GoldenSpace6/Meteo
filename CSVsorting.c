@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "abr.c"
 #define MAX_LINE_LEN 1024
 
 int main(int argc, char *argv[])
@@ -9,14 +9,15 @@ int main(int argc, char *argv[])
 char *input_file = NULL;
 char *output_file = NULL;
 int descending = 0;
+int sorting =0;
 int i;
 
 // Parse command line arguments
 for (i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-f") == 0) {
         if (i + 1 < argc) {
-			i+=1;
-            input_file = argv[i];
+	    i+=1;
+	    input_file = argv[i];
         } else {
             fprintf(stderr, "Error: missing file name after -f option\n");
             return 1;
@@ -31,6 +32,12 @@ for (i = 1; i < argc; i++) {
         }
     } else if (strcmp(argv[i], "-r") == 0) {
         descending = 1;
+    else if (strcmp(argv[i], "--tab") == 0) {
+        sorting = 2;
+    }else if (strcmp(argv[i], "--abr") == 0) {
+        sorting = 1;
+    }else if (strcmp(argv[i], "--avl") == 0) {
+        sorting = 0;
     } else {
         fprintf(stderr, "Error: unrecognized option %s\n", argv[i]);
         return 1;
