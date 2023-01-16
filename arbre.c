@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//1)4 2)2 2 3)11 4)4  //1 2 7 8 15 16 9 4 10 12 6 13 17 18 19 20 14 //1 2 4 6 7 8 9 10 12 13 14 15 16 17 18 19 20
 typedef struct arbre {
   int val;
   int eq;
   int h;
+  char** line;
   struct arbre* fg;
   struct arbre* fd;
 }Arbre;
@@ -224,51 +224,3 @@ int hauteur(pArbre a) {
   }
   return max(hauteur(a->fg),hauteur(a->fd))+1;
 }
-//EX 3
-int estFiliforme(pArbre a) {
-  if(estVide(a)) {
-    return 1;
-  }
-  if(estFeuille(a)) {
-    return 1;
-  }
-  return estFiliforme(a->fd)&&estVide(a->fg) || estFiliforme(a->fg)&&estVide(a->fd);
-}
-int estPeigneGauche(pArbre a) {
-  if(estVide(a)) {
-    return 0;
-  }
-  if(estFeuille(a)) {
-    return 1;
-  }
-  return estPeigneGauche(a->fg)&&estVide(a->fd);
-}
-pArbre creerPeigneGauche(int h) {
-  if(h<=0) {
-    return NULL;
-  }
-  pArbre temp =creerArbre(rand()%11);
-  temp->fg=creerPeigneGauche(h-1);
-  return temp;
-}
-
-void oldMain() {
-  srand(time(NULL));
-  pArbre a=creerArbre(3);
-  ajouteFilsGauche(a,4);
-  ajouteFilsDroit(a,5);
-  pArbre b=creerArbre(2);
-  b->fg=a;
-  a=creerArbre(6);
-  ajouteFilsDroit(a,7);
-  b->fd=a;
-  a=creerArbre(1);
-  a->fg=b;
-  b=creerArbre(8);
-  ajouteFilsGauche(b,9);
-  ajouteFilsDroit(b,10);
-  a->fd=b;
-  pArbre c=creerPeigneGauche(10);
-  //parcourslargeur(c);
-}
-
