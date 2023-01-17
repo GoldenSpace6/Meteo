@@ -215,7 +215,7 @@ if [ -n "$d" ] || [ -n "$region" ];then
         #awk -F";" '{$2=substr(system("date -d "substr($2,0,10)" +%s"),5,30);print $0}' meteo_filtered_data_v1.csv
 
         #awk -F";" '{print $0";"substr(system("date -d "substr($2,0,10)" +%s"),5,30)}' meteo_filtered_data_v1.csv
-    
+
 
         awk -F";" 'substr($10,0,index($10,",")-1)-('${Area[0]}')>0 && substr($10,0,index($10,",")-1)-('${Area[1]}')<0 && substr($10,index($10,",")+1,100)-('${Area[2]}')>0 && substr($10,index($10,",")+1,100)-('${Area[3]}')<0 {print $0}' $ffile > filetemp.csv
         ffile=filetemp.csv
@@ -226,6 +226,17 @@ if (($w == 1));then
     cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
 fi
 case $t in
+    1)
+        cut $ffile -f1,11,12,13 -d";" > temperature.csv
+        ;;
+    2)
+        cut $ffile -f16,11,12,13 -d";" > temperature.csv
+        ;;
+    3)
+
+    *);;
+esac
+case $p in
     1)
         cut $ffile -f1,11,12,13 -d";" > temperature.csv
         ;;
