@@ -222,9 +222,6 @@ if [ -n "$d" ] || [ -n "$region" ];then
     fi
 fi
 
-if (($w == 1));then 
-    cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
-fi
 case $t in
     1)
         cut $ffile -f1,11,12,13 -d";" > temperature.csv
@@ -238,17 +235,20 @@ case $t in
 esac
 case $p in
     1)
-        cut $ffile -f1,11,12,13 -d";" > temperature.csv
+        cut $ffile -f1,11,12,13 -d";" > pressure.csv
         ;;
     2)
-        cut $ffile -f16,11,12,13 -d";" > temperature.csv
+        cut $ffile -f16,11,12,13 -d";" > pressure.csv
         ;;
     3)
 
     *);;
 esac
-if (($t == 1));then 
-    cut meteo_filtered_data_v1.csv -f1,11,12,13 -d";" > temperature.csv
+if (($w == 1));then 
+    cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
+fi
+if (($h == 1));then 
+    cut meteo_filtered_data_v1.csv -f3 -d";" > height.csv
 
 IFS=$OIFS
 
