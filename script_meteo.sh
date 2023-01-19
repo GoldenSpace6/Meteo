@@ -211,13 +211,12 @@ if [ -n "$d" ] || [ -n "$region" ];then
                 echo Error Wrong region
                 exit 1
         esac
-
-        #awk -F";" '{$2=substr(system("date -d "substr($2,0,10)" +%s"),5,30);print $0}' meteo_filtered_data_v1.csv
-
-        #awk -F";" '{print $0";"substr(system("date -d "substr($2,0,10)" +%s"),5,30)}' meteo_filtered_data_v1.csv
-
-
-        awk -F";" 'substr($10,0,index($10,",")-1)-('${Area[0]}')>0 && substr($10,0,index($10,",")-1)-('${Area[1]}')<0 && substr($10,index($10,",")+1,100)-('${Area[2]}')>0 && substr($10,index($10,",")+1,100)-('${Area[3]}')<0 {print $0}' $ffile > filetemp.csv
+        #awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' meteo_filtered_data_v1.csv > secondsince1970.csv
+        
+        awk -F"[;T:-]" '{print $2$3$4$5}' meteo_filtered_data_v1.csv
+        paste meteo_filtered_data_v1.csv secondsince1970.csv | column -s $'\t' -t
+    
+        awk -F"[;,]" '$10-('${Area[0]}')>0 && $10-('${Area[1]}')<0 && $11-('${Area[2]}')>0 && $11-('${Area[3]}')<0 {print $0}' $ffile > filetemp.csv
         ffile=filetemp.csv
     fi
 fi
