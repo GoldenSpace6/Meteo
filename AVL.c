@@ -100,6 +100,21 @@ pArbre insertAVL(pArbre a, int e) {
   return a;
 }
 
+Arbre balance(Arbre a) {
+    if(a->eq >= 2) {
+        if(a->fd->eq >= 0) {
+            return rotationGauche(a);
+        } else {
+            return doubleRotationGauche(a);
+        }
+    } else if(a->eq <= 2) {
+        if(a->fg->eq <= 0) {
+            return rotationDroit(a);
+        } else {
+            return doubleRotationDroit(a);
+        }
+ }
+
 void main() {
     
     //prAbre a=oldMain2();
