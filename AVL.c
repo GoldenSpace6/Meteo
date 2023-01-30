@@ -91,6 +91,7 @@ pArbre insertAVL(pArbre a, int e) {
   }
   if (a->val>e) {
     a->fg=insertAVL(a->fg,e);
+    *h=-*h
   } else {
     a->fd=insertAVL(a->fd,e);
   }
