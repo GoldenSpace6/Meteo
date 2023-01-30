@@ -66,13 +66,13 @@ pArbre doubleRotationGauche(pArbre A) {
     return A;
 }
 pArbre equilibrerAVL(pArbre a) {
-    if(a->eq==2) {
+    if(a->eq>=2) {
         if(a->fd->eq==-1) {
             return doubleRotationGauche(a);
         }
         return rotationGauche(a);
     }
-    if(a->eq==-2) {
+    if(a->eq<=-2) {
         if(a->fd->eq==1) {
             return doubleRotationDroit(a);
         }
@@ -86,6 +86,7 @@ pArbre insertAVL(pArbre a, int e) {
     return creerArbre(e);
   }
   if(a->val==e) {
+    *h=0;
     return a;
   }
   if (a->val>e) {
@@ -99,21 +100,6 @@ pArbre insertAVL(pArbre a, int e) {
   //ajouteeq(a);
   return a;
 }
-
-Arbre balance(Arbre a) {
-    if(a->eq >= 2) {
-        if(a->fd->eq >= 0) {
-            return rotationGauche(a);
-        } else {
-            return doubleRotationGauche(a);
-        }
-    } else if(a->eq <= 2) {
-        if(a->fg->eq <= 0) {
-            return rotationDroit(a);
-        } else {
-            return doubleRotationDroit(a);
-        }
- }
 
 void main() {
     
