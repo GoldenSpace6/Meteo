@@ -154,11 +154,12 @@ fi
 
 
 # ---- Filtering Data ---- V2
-ffile=$file
 
-#awk -F";" '{print substr( $0, 0, index($0,";")+1 )    substr($0, index(substr($0,0,index($0,";")+2),";")+1, 10000 ) }' meteo_filtered_data_v1.csv
-awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' $ffile > secondsince1970.csv
-paste -d';' $ffile secondsince1970.csv > meteo_data_w_date.csv
+head -n1 $file > titleless_meteo.csv
+
+awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > secondsince1970.csv
+
+paste -d';' titleless_meteo.csv secondsince1970.csv > meteo_data_w_date.csv
 
 ffile="meteo_data_w_date.csv"
 
@@ -168,7 +169,7 @@ if [ -n "$d" ]; then
     set -- $d
     dmin=$(date -d $1 +%s)
     dmax=$(date -d $2 +%s)
-    
+    echo $dmin $dmax
     awk -F";" '$16>'$dmin' && $16<'$dmax' {print $0}' $ffile > filtered_date.csv
     ffile="filtered_date.csv"
 fi
@@ -212,6 +213,7 @@ case $t in
     3)
 
         ;;
+    *);;
 esac
 case $p in
     1)
@@ -223,15 +225,16 @@ case $p in
     3)
 
         ;;
+    *);;
 esac
 if (($w == 1));then 
     cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
 fi
 if (($h == 1));then 
     cut meteo_filtered_data_v1.csv -f3 -d";" > height.csv
-
+fi
 IFS=$OIFS
-#kill secondsince1970.csv 
+#kill titleless_meteo.csv secondsince1970.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv
 echo "file = $ffile"
 echo "p = $p"
 echo "t = $t"
