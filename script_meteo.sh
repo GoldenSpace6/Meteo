@@ -157,69 +157,50 @@ fi
 ffile=$file
 
 #awk -F";" '{print substr( $0, 0, index($0,";")+1 )    substr($0, index(substr($0,0,index($0,";")+2),";")+1, 10000 ) }' meteo_filtered_data_v1.csv
+awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' $ffile > secondsince1970.csv
+paste -d';' $ffile secondsince1970.csv > meteo_data_w_date.csv
 
+ffile="meteo_data_w_date.csv"
 
-if [ -n "$d" ] || [ -n "$region" ];then
-    #Date
-    if [ -n "$d" ]; then
-        IFS=","
-        set -- $d
-        dmin=$(date -d $1 +%s)
-        dmax=$(date -d $2 +%s)
-    fi
-    for i in $loop;do
-        IFS=";"
-        HOLA=(${i})
-
-        #echo "$1 ; $2 ; $3 ; $4 ; $5 ; $6 ; $7 ; $8 ; $9 ; ${10}"
-        save=1
-        lm=$(( lm + 1 ))
-
-        if [ $lm -eq "20" ];then
-            echo $ght
-            lm=0
-            ght=$(( ght + 1 ))
-        fi
-        
-        #Date
-        if [ -n "$d" ]; then
-            tempdate=`date -d ${HOLA[1]} +%s`
-            if (( $tempdate < $dmin || $tempdate > $dmax )); then
-                save=0
-            fi
-        fi
-    done
-
-    #Region
-    if [ -n "$region" ]; then
-        case $region in
-            # Create a Area that contain the whole region
-            # [minLatitude,maxLatitude,minLongitude,maxLongitude]
-            F)
-                Area=(38.5 51.5 -6.5 10.5);;
-            G)
-                Area=(1.5 7 -55.5 -51);;
-            S)
-                Area=(46 48 -58 -54);;
-            A)
-                Area=(9 29 -92 -55);;
-            O)
-                Area=(-60 7 20 120);;
-            Q)
-                Area=(-90 -60 -180 180);;
-            *)
-                echo Error Wrong region
-                exit 1
-        esac
-        #awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' meteo_filtered_data_v1.csv > secondsince1970.csv
-        
-        awk -F"[;T:-]" '{print $2$3$4$5}' meteo_filtered_data_v1.csv
-        paste meteo_filtered_data_v1.csv secondsince1970.csv | column -s $'\t' -t
+# ---- Date
+if [ -n "$d" ]; then
+    IFS=","
+    set -- $d
+    dmin=$(date -d $1 +%s)
+    dmax=$(date -d $2 +%s)
     
-        awk -F"[;,]" '$10-('${Area[0]}')>0 && $10-('${Area[1]}')<0 && $11-('${Area[2]}')>0 && $11-('${Area[3]}')<0 {print $0}' $ffile > filetemp.csv
-        ffile=filetemp.csv
-    fi
+    awk -F";" '$16>'$dmin' && $16<'$dmax' {print $0}' $ffile > filtered_date.csv
+    ffile="filtered_date.csv"
 fi
+    
+   
+
+# ---- Region
+if [ -n "$region" ]; then
+    case $region in
+        # Create a Area that contain the whole region
+        # [minLatitude,maxLatitude,minLongitude,maxLongitude]
+        F)
+            Area=(38.5 51.5 -6.5 10.5);;
+        G)
+            Area=(1.5 7 -55.5 -51);;
+        S)
+            Area=(46 48 -58 -54);;
+        A)
+            Area=(9 29 -92 -55);;
+        O)
+            Area=(-60 7 20 120);;
+        Q)
+            Area=(-90 -60 -180 180);;
+        *)
+            echo Error Wrong region
+            exit 1
+    esac
+
+    awk -F"[;,]" '$10-('${Area[0]}')>0 && $10-('${Area[1]}')<0 && $11-('${Area[2]}')>0 && $11-('${Area[3]}')<0 {print $0}' $ffile > filtered_area.csv
+    ffile="filtered_area.csv"
+fi
+
 
 case $t in
     1)
@@ -230,7 +211,7 @@ case $t in
         ;;
     3)
 
-    *);;
+        ;;
 esac
 case $p in
     1)
@@ -241,7 +222,7 @@ case $p in
         ;;
     3)
 
-    *);;
+        ;;
 esac
 if (($w == 1));then 
     cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
@@ -250,7 +231,7 @@ if (($h == 1));then
     cut meteo_filtered_data_v1.csv -f3 -d";" > height.csv
 
 IFS=$OIFS
-
+#kill secondsince1970.csv 
 echo "file = $ffile"
 echo "p = $p"
 echo "t = $t"
