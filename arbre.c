@@ -4,7 +4,6 @@
 typedef struct arbre {
   int val;
   int eq;
-  int h;
   char** line;
   struct arbre* fg;
   struct arbre* fd;
