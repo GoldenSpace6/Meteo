@@ -2,34 +2,16 @@
 #include <stdlib.h>
 #include "ABR.c"
 
-int hauteurS(pArbre a) {
-    if(estVide(a)) {
-        return -1;
-    }
-    if(existeFilsDroit(a)) {
-        if ( existeFilsGauche(a)) {
-            return max(a->fd->h,a->fg->h)+1;
-        }
-        return a->fd->h+1;
-    }
-    if ( existeFilsGauche(a)) {
-        return a->fg->h+1;
-    }
-    return 0;
-}
-
 pArbre rotationGauche(pArbre A) {
     if(existeFilsDroit(A)) {
         //rotation de l'abre
         pArbre pivot = A->fd;
         A->fd = pivot->fg;
-        pivot->fd = A;
+        pivot->fg = A;
         //changement de l'equilibre
         A->eq = 1 - pivot->eq;
-        pivot->eq = - A->eq;
-        //changement de hauteur 
-        A->h = hauteurS(A);
-        pivot->h = hauteurS(pivot);
+        pivot->eq = -1 + pivot->eq;
+
         return pivot;
     }
     return A;
@@ -40,13 +22,11 @@ pArbre rotationDroit(pArbre A) {
         //rotation de l'abre
         pArbre pivot=A->fg;
         A->fg=pivot->fd;
-        pivot->fg=A;
+        pivot->fd=A;
         //changement de l'equilibre
-        A->eq= -1 - pivot->eq;
-        pivot->eq = - A->eq;
-        //changement de hauteur
-        A->h = hauteurS(A);
-        pivot->h = hauteurS(pivot);
+        A->eq = -1 - pivot->eq;
+        pivot->eq = 1 + pivot->eq;
+
         return pivot;
     }
     return A;
@@ -81,25 +61,31 @@ pArbre equilibrerAVL(pArbre a) {
     }
     return a;
 }
-pArbre insertAVL(pArbre a, int e) {
-  if(estVide(a)) {
-    return creerArbre(e);
-  }
-  if(a->val==e) {
-    *h=0;
+pArbre insertAVL(pArbre a, int e,int*h) {
+    if(estVide(a)) {
+        *h=1;
+        return creerArbre(e);
+    }
+    if (a->val>e) {
+        a->fg=insertAVL(a->fg,e,h);
+        *h=-*h
+    } else if (a->val<e) {
+     a->fd=insertAVL(a->fd,e,h);
+    } else {
+        *h=0;
+        return a;
+    }
+
+    if(*h != 0) {
+        a->eq = a->eq + *h;
+        a = equilibrerAVL(a);
+        if (a->eq == 0) {
+            *h=0;
+        } else {
+            *h=1;
+        }
+    }
     return a;
-  }
-  if (a->val>e) {
-    a->fg=insertAVL(a->fg,e);
-    *h=-*h
-  } else {
-    a->fd=insertAVL(a->fd,e);
-  }
-  a->eq = hauteurS(a->fd)-hauteurS(a->fg);
-  a = equilibrerAVL(a);
-  a->h = hauteurS(a);
-  //ajouteeq(a);
-  return a;
 }
 
 void main() {
@@ -107,8 +93,9 @@ void main() {
     //prAbre a=oldMain2();
     pArbre b=NULL;
     int tab[3]={1, 2, 3};
+    int h=0;
     for(int i=0;i<3;i++) {
-        b=insertAVL(b,tab[i]);
+        b=insertAVL(b,tab[i],&h);
     }
     //parcoursInfixe(b);
     //printf("%d",b->val);
@@ -116,7 +103,7 @@ void main() {
     tab[0]=3;
     tab[2]=1;
     for(int j=0;j<3;j++) {
-        c=insertAVL(c,tab[j]);
+        c=insertAVL(c,tab[j],&h);
     }
     //c=doubleRotationDroit(c);
     parcoursInfixe(c);
