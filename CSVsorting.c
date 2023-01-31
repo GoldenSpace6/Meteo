@@ -76,32 +76,35 @@ while (fgets(line, MAX_LINE_LEN, in) != NULL) {
 */
 // ---------------------------------------------
 // Read the lines of the input file into an array
-pArbre AVL=NULL;
+pArbre A=NULL;
 char line[MAX_LINE_LEN]="";
 int* h=0;
 
-char delim[] = "\n";
 char* prevptr="";
 char* ptr;
 char* temp;
 while (fgets(line, MAX_LINE_LEN, in) != NULL) {
     
-    ptr = strtok(line, delim);
+    ptr = strtok(line, "\n");
     // - Connet to previeus line incase fgets cut it in middle of line
     //test start have \n
     if(ptr==line) {
         strcat(prevptr,ptr);
-        ptr = strtok(NULL, delim);
+        ptr = strtok(NULL, "\n");
     }
     
     while(ptr != NULL) {
         temp = malloc( (strlen(ptr) + 1)*sizeof(char) );
         strcpy(temp, prevptr);
         printf("%s\n", temp);
-        //insertAVL(AVL,5,temp,h);
+        if(sorting==0) {
+            insertAVL(A,atoi(strtok(prevptr,";")),temp,h);
+        } else if(sorting==1) {
+            insertABR(A,atoi(strtok(prevptr,";")),temp);
+        }
         prevptr=ptr;
 
-        ptr = strtok(NULL, delim);
+        ptr = strtok(NULL, "\n");
 	}
     // - Disconnet to previeus line incase fgets cut it in wrong place
     //test end have \n
@@ -109,7 +112,11 @@ while (fgets(line, MAX_LINE_LEN, in) != NULL) {
         temp = malloc( (strlen(ptr) + 1)*sizeof(char) );
         strcpy(temp, prevptr);
         printf("%s\n", temp);
-        //insertAVL(AVL,5,temp,h);
+        if(sorting==0) {
+            insertAVL(A,atoi(strtok(prevptr,";")),temp,h);
+        } else if(sorting==1) {
+            insertABR(A,atoi(strtok(prevptr,";")),temp);
+        }
         prevptr="";
     }
 }
@@ -132,9 +139,9 @@ while ((read = getline(&line, &len, in)) != -1) {
 
 // Write the sorted lines to the output file
 if(descending==0) {
-    fputsInfixeAcs(AVL,out);
+    fputsInfixeAcs(A,out);
 } else {
-    fputsInfixeDis(AVL,out);
+    fputsInfixeDis(A,out);
 }
 
 // Close the files and free memory
