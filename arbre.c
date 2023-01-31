@@ -59,7 +59,6 @@ pArbre creerArbre(int a) {
   }
   c->val=a;
   c->eq=0;
-  c->h=0;
   c->fg=NULL;
   c->fd=NULL;
   return c;
