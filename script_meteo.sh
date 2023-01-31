@@ -155,7 +155,7 @@ fi
 
 # ---- Filtering Data ---- V2
 
-head -n1 $file > titleless_meteo.csv
+tail -n+2 $file > titleless_meteo.csv
 
 awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > secondsince1970.csv
 
