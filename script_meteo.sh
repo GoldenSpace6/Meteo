@@ -152,28 +152,27 @@ fi
 #    ffile="filtered_meteo.csv"
 #fi
 
-
-# ---- Filtering Data ---- V2
+# ----------------------------------------------
+# ------------- Filtering Data V2 --------------
+# ----------------------------------------------
 
 tail -n+2 $file > titleless_meteo.csv
 echo Removed head
 
-awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > secondsince1970.csv
+awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > simpledate.csv
 echo created date
-#too slow #awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > secondsince1970.csv
 
-paste -d';' secondsince1970.csv titleless_meteo.csv > meteo_data_w_date.csv
+paste -d';' simpledate.csv titleless_meteo.csv > meteo_data_w_date.csv
 echo appended date
 
 ffile="meteo_data_w_date.csv"
 
 # ---- Date
 if [ -n "$d" ]; then
-    IFS=","
+    IFS=",-"
     set -- $d
-    dmin=$(date -d $1 +%s)
-    dmax=$(date -d $2 +%s)
-    echo $dmin $dmax
+    dmin=$1$2$3"00"
+    dmax=$4$5$6"00"
     awk -F";" '$1>'$dmin' && $1<'$dmax' {print $0}' $ffile > filtered_date.csv
     ffile="filtered_date.csv"
 fi
@@ -204,39 +203,69 @@ if [ -n "$region" ]; then
     ffile="filtered_area.csv"
 fi
 
+# -------------------------------------------
+# ----------------- Sorting -----------------
+# -------------------------------------------
 
 case $t in
     1)
         cut $ffile -f2,12,13,14 -d";" > temperature.csv
+        ./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
+        #Station;moy;min;max
         ;;
     2)
-        cut $ffile -f1,12,13,14 -d";" > temperature.csv
+        cut $ffile -f1,12 -d";" > temperature.csv
+        ./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
+        #Station;moy;min;max
         ;;
     3)
-
+        cut $ffile -f1,2,3,12 -d";" > temperature.csv
+        ./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
+        #Date;Station,real Date,moy
         ;;
-    *);;
 esac
 case $p in
     1)
-        cut $ffile -f1,11,12,13 -d";" > pressure.csv
+        cut $ffile -f2,4,8,9 -d";" > pressure.csv
+        ./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
+        #Station;mer;pre sta;var
         ;;
     2)
-        cut $ffile -f16,11,12,13 -d";" > pressure.csv
-        ;;
+        cut $ffile -f1,8 -d";" > pressure.csv
+        ./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
+        #Station;pre sta
+       ;;
     3)
-
+        cut $ffile -f1,2,3,8 -d";" > temperature.csv
+        ./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
+        #Date;Station,real Date,pre sta
         ;;
-    *);;
 esac
 if (($w == 1));then 
-    cut meteo_filtered_data_v1.csv -f1,4,5 -d";" > wind.csv
+    cut meteo_filtered_data_v1.csv -f2,5,6,11 -d";" > wind.csv
+    ./CSVsorting -f wind.csv -o sorted_wind.csv --$sort
+    #Station,direction,vitesse,coord
 fi
 if (($h == 1));then 
-    cut meteo_filtered_data_v1.csv -f3 -d";" > height.csv
+    cut meteo_filtered_data_v1.csv -f15,11 -d";" > height.csv
+    ./CSVsorting -f wind.csv -o sorted_wind.csv --$sort -r
+    #Height,Coord
 fi
+if (($m == 1));then 
+    cut meteo_filtered_data_v1.csv -f7,11 -d";" > humidity.csv
+    ./CSVsorting -f wind.csv -o sorted_wind.csv --$sort -r
+    #Humidity,Coord
+fi
+
+# -------------------------------------------
+# ----------------- GnuPlot -----------------
+# -------------------------------------------
+
+
 IFS=$OIFS
-#kill titleless_meteo.csv secondsince1970.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv
+#kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv 
+#kill temperature.csv sorted_temperature.csv pressure.csv sorted_pressure.csv wind.csv sorted_wind.csv height.csv sorted_height.csv humidity.csv sorted_humidity.csv
+# ---- Test ----
 echo "file = $ffile"
 echo "p = $p"
 echo "t = $t"

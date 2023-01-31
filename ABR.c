@@ -86,7 +86,7 @@ pArbre suppressionElmt(pArbre a,int e) {
 }
 
 pArbre oldMain2() {
-  oldMain();
+  //oldMain();
   pArbre temp = NULL;
   int tab[9]={10, 3, 5, 15, 20, 12, 7, 45, 9};
   for(int i=0;i<9;i++) {
@@ -95,12 +95,12 @@ pArbre oldMain2() {
 
   int min=temp->val;
   int max=temp->val;
-  minmax(temp,&min,&max);
+  //minmax(temp,&min,&max);
   printf("%d %d",min,max);
 
   //suppressionElmt(temp,15);
   parcoursInfixe(temp);
-  printf("%d",recherche2(temp,19));
+  //printf("%d",recherche2(temp,19));
   if(recherche(temp,12)==0) {
     printf("\n12 n'appartient pas a temp");
   }
