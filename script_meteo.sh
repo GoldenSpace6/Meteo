@@ -215,45 +215,45 @@ case $t in
         ;;
     2)
         cut $ffile -f1,12 -d";" > temperature.csv
-        ./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
+        #./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
         #Station;moy;min;max
         ;;
     3)
         cut $ffile -f1,2,3,12 -d";" > temperature.csv
-        ./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
+        #./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
         #Date;Station,real Date,moy
         ;;
 esac
 case $p in
     1)
         cut $ffile -f2,4,8,9 -d";" > pressure.csv
-        ./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
+        #./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
         #Station;mer;pre sta;var
         ;;
     2)
         cut $ffile -f1,8 -d";" > pressure.csv
-        ./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
+        #./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
         #Station;pre sta
        ;;
     3)
         cut $ffile -f1,2,3,8 -d";" > temperature.csv
-        ./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
+        #./CSVsorting -f pressure.csv -o sorted_pressure.csv --$sort
         #Date;Station,real Date,pre sta
         ;;
 esac
 if (($w == 1));then 
     cut meteo_filtered_data_v1.csv -f2,5,6,11 -d";" > wind.csv
-    ./CSVsorting -f wind.csv -o sorted_wind.csv --$sort
+    #./CSVsorting -f wind.csv -o sorted_wind.csv --$sort
     #Station,direction,vitesse,coord
 fi
 if (($h == 1));then 
     cut meteo_filtered_data_v1.csv -f15,11 -d";" > height.csv
-    ./CSVsorting -f wind.csv -o sorted_wind.csv --$sort -r
+    #./CSVsorting -f wind.csv -o sorted_wind.csv --$sort -r
     #Height,Coord
 fi
 if (($m == 1));then 
     cut meteo_filtered_data_v1.csv -f7,11 -d";" > humidity.csv
-    ./CSVsorting -f wind.csv -o sorted_wind.csv --$sort -r
+    #./CSVsorting -f wind.csv -o sorted_wind.csv --$sort -r
     #Humidity,Coord
 fi
 

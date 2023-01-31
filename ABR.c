@@ -23,17 +23,17 @@ void ajouteeq(pArbre a) {
   }
 }
 //AVL "/!\"
-pArbre insertABR(pArbre a, int e) {
+pArbre insertABR(pArbre a, int e, char* line) {
   if(estVide(a)) {
-    return creerArbre(e);
+    return creerArbre(e,line);
   }
   if(a->val==e) {
     return a;
   }
   if (a->val>e) {
-    a->fg=insertABR(a->fg,e);
+    a->fg=insertABR(a->fg,e,line);
   } else {
-    a->fd=insertABR(a->fd,e);
+    a->fd=insertABR(a->fd,e,line);
   }
   return a;
 }
@@ -90,22 +90,8 @@ pArbre oldMain2() {
   pArbre temp = NULL;
   int tab[9]={10, 3, 5, 15, 20, 12, 7, 45, 9};
   for(int i=0;i<9;i++) {
-    temp=insertABR(temp,tab[i]);
+    temp=insertABR(temp,tab[i],NULL);
   }
-
-  int min=temp->val;
-  int max=temp->val;
-  //minmax(temp,&min,&max);
-  printf("%d %d",min,max);
-
   //suppressionElmt(temp,15);
   parcoursInfixe(temp);
-  //printf("%d",recherche2(temp,19));
-  if(recherche(temp,12)==0) {
-    printf("\n12 n'appartient pas a temp");
-  }
-  if(recherche(temp,13)==0) {
-    printf("\n13 n'appartient pas a temp");
-  }
-  return temp;
 }

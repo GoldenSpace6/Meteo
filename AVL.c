@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ABR.c"
+
 int eq(pArbre a) {
     if(a==NULL) {
         return 0;
@@ -67,16 +68,16 @@ pArbre equilibrerAVL(pArbre a) {
     }
     return a;
 }
-pArbre insertAVL(pArbre a, int e,int*h) {
+pArbre insertAVL(pArbre a, int e, char* line, int*h) {
     if(estVide(a)) {
         *h=1;
-        return creerArbre(e);
+        return creerArbre(e,line);
     }
     if (a->val>e) {
-        a->fg=insertAVL(a->fg,e,h);
+        a->fg=insertAVL(a->fg,e,line,h);
         *h=-*h;
     } else if (a->val<e) {
-     a->fd=insertAVL(a->fd,e,h);
+     a->fd=insertAVL(a->fd,e,line,h);
     } else {
         *h=0;
         return a;
@@ -99,8 +100,9 @@ void main() {
     pArbre b=NULL;
     int tab[100]={ 90, 74, 38, 50, 1, 82, 70, 76, 98, 93, 42, 75, 39, 59, 2, 22, 43, 99, 5, 92, 27, 17, 15, 83, 87, 58, 69, 6, 100, 53, 40, 26, 68, 33, 56, 21, 28, 16, 67, 24, 80, 49, 35, 97, 95, 47, 65, 14, 61, 25, 8, 85, 12, 23, 64, 89, 54, 77, 79, 19, 62, 84, 32, 52, 72, 3, 11, 86, 71, 10, 94, 57, 45, 20, 46, 51, 44, 30, 60, 91, 36, 18, 13, 55, 48, 73, 81, 7, 4, 66, 31, 29, 37, 96, 9, 41, 78, 88, 34, 63};
     int h=0;
+    char* l=NULL;
     for(int i=0;i<3;i++) {
-        b=insertAVL(b,tab[i],&h);
+        b=insertAVL(b,tab[i],l,&h);
     }
     //parcoursInfixe(b);
 }

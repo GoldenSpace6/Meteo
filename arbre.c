@@ -4,19 +4,20 @@
 typedef struct arbre {
   int val;
   int eq;
-  char** line;
+  char* line;
   struct arbre* fg;
   struct arbre* fd;
 }Arbre;
 typedef Arbre * pArbre;
 //ARBRE
-pArbre creerArbre(int a) {
+pArbre creerArbre(int a, char* line) {
   pArbre c=malloc(sizeof(Arbre));
   if(c==NULL){
     printf("erreur malloc creerArbre()");
     exit(1);
   }
   c->val=a;
+  c->line=line;
   c->eq=0;
   c->fg=NULL;
   c->fd=NULL;
@@ -61,43 +62,34 @@ int existeFilsDroit(pArbre a) {
   }
   return 1;
 }
-int ajouteFilsGauche(pArbre a, int e) {
-  if(existeFilsGauche(a)) {
-    return -1;
-  }
-  pArbre pfg =creerArbre(e);
-  a->fg=pfg;
-  return 1;
-}
-int ajouteFilsDroit(pArbre a, int e) {
-  if(existeFilsDroit(a)) {
-    return -1;
-  }
-  pArbre pfd =creerArbre(e);
-  a->fd=pfd;
-  return 1;
-}
-void traiter(pArbre a) {
+void traiter(pArbre a,FILE* out) {
   if(estVide(a)) {
     printf("a est vide");
+    exit(4);
   } else {
-    printf("%d",a->val);
+    fputs(a->line,out);
   }
 }
 void parcoursPrefixe(pArbre a) {
   if(estVide(a)==0) {
-    traiter(a);
-    printf(",");
+    printf("%d,",a->val);
     parcoursPrefixe(a->fg);
     parcoursPrefixe(a->fd);
   }
 }
-void parcoursInfixe(pArbre a) {
+
+void fputsInfixeAcs(pArbre a,FILE* out) {
   if(estVide(a)==0) {
-    parcoursInfixe(a->fg);
-    traiter(a);
-    printf(",");
-    parcoursInfixe(a->fd);
+    fputsInfixeAcs(a->fg, out);
+    traiter(a,out);
+    fputsInfixeAcs(a->fd, out);
+  }
+}
+void fputsInfixeDis(pArbre a,FILE* out) {
+  if(estVide(a)==0) {
+    fputsInfixeDis(a->fg, out);
+    traiter(a,out);
+    fputsInfixeDis(a->fd, out);
   }
 }
 
@@ -105,6 +97,7 @@ void supprimerRacine(pArbre a) {
   if(estVide(a)==0) {
     supprimerRacine(a->fg);
     supprimerRacine(a->fd);
+    free(a->line);
     free(a);
   }
 }
