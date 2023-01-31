@@ -156,10 +156,14 @@ fi
 # ---- Filtering Data ---- V2
 
 tail -n+2 $file > titleless_meteo.csv
+echo Removed head
 
 awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > secondsince1970.csv
+echo created date
+#too slow #awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > secondsince1970.csv
 
-paste -d';' titleless_meteo.csv secondsince1970.csv > meteo_data_w_date.csv
+paste -d';' secondsince1970.csv titleless_meteo.csv > meteo_data_w_date.csv
+echo appended date
 
 ffile="meteo_data_w_date.csv"
 
@@ -170,11 +174,9 @@ if [ -n "$d" ]; then
     dmin=$(date -d $1 +%s)
     dmax=$(date -d $2 +%s)
     echo $dmin $dmax
-    awk -F";" '$16>'$dmin' && $16<'$dmax' {print $0}' $ffile > filtered_date.csv
+    awk -F";" '$1>'$dmin' && $1<'$dmax' {print $0}' $ffile > filtered_date.csv
     ffile="filtered_date.csv"
 fi
-    
-   
 
 # ---- Region
 if [ -n "$region" ]; then
@@ -198,17 +200,17 @@ if [ -n "$region" ]; then
             exit 1
     esac
 
-    awk -F"[;,]" '$10-('${Area[0]}')>0 && $10-('${Area[1]}')<0 && $11-('${Area[2]}')>0 && $11-('${Area[3]}')<0 {print $0}' $ffile > filtered_area.csv
+    awk -F"[;,]" '$11-('${Area[0]}')>0 && $11-('${Area[1]}')<0 && $12-('${Area[2]}')>0 && $12-('${Area[3]}')<0 {print $0}' $ffile > filtered_area.csv
     ffile="filtered_area.csv"
 fi
 
 
 case $t in
     1)
-        cut $ffile -f1,11,12,13 -d";" > temperature.csv
+        cut $ffile -f2,12,13,14 -d";" > temperature.csv
         ;;
     2)
-        cut $ffile -f16,11,12,13 -d";" > temperature.csv
+        cut $ffile -f1,12,13,14 -d";" > temperature.csv
         ;;
     3)
 
