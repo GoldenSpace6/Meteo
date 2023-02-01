@@ -93,5 +93,5 @@ pArbre oldMain2() {
     temp=insertABR(temp,tab[i],NULL);
   }
   //suppressionElmt(temp,15);
-  parcoursInfixe(temp);
+  //parcoursInfixe(temp);
 }
