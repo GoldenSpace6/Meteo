@@ -81,16 +81,21 @@ char line[MAX_LINE_LEN]="";
 int h=0;
 char* temp;
 char* temp2;
+int val;
 while (fgets(line, MAX_LINE_LEN, in) != NULL) {
     temp = malloc( (strlen(line) + 1)*sizeof(char) );
-    temp2 = malloc( (strlen(line) + 1)*sizeof(char) );
+    //temp2 = malloc( (strlen(line) + 1)*sizeof(char) );
     strcpy(temp,line);
-    strcpy(temp2,line);
+    //strcpy(temp2,line);
     //printf("%s\n", temp);
+    temp2=strchr(temp,';');
+    *temp2='\0';
+    val=atoi(temp);
+    *temp2=';';
     if(sorting==0) {
-        A=insertAVL(A,atoi(strtok(temp,";")),temp2,&h);
+        A=insertAVL(A,val,temp,&h);
     } else if(sorting==1) {
-        A=insertABR(A,atoi(strtok(temp,";")),temp2);
+        A=insertABR(A,val,temp);
     }
 }
 /* ---------------------------------------------
