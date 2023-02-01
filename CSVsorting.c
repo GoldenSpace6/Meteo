@@ -80,15 +80,17 @@ pArbre A=NULL;
 char line[MAX_LINE_LEN]="";
 int h=0;
 char* temp;
-
+char* temp2;
 while (fgets(line, MAX_LINE_LEN, in) != NULL) {
     temp = malloc( (strlen(line) + 1)*sizeof(char) );
+    temp2 = malloc( (strlen(line) + 1)*sizeof(char) );
     strcpy(temp,line);
+    strcpy(temp2,line);
     //printf("%s\n", temp);
     if(sorting==0) {
-        insertAVL(A,atoi(strtok(temp,";")),temp,&h);
+        A=insertAVL(A,atoi(strtok(temp,";")),temp2,&h);
     } else if(sorting==1) {
-        insertABR(A,atoi(strtok(temp,";")),temp);
+        A=insertABR(A,atoi(strtok(temp,";")),temp2);
     }
 }
 /* ---------------------------------------------
@@ -111,7 +113,7 @@ while ((read = getline(&line, &len, in)) != -1) {
 if(descending==0) {
     fputsInfixeAcs(A,out);
 } else {
-    fputsInfixeDis(A,out);
+    fputsInfixeDes(A,out);
 }
 
 // Close the files and free memory

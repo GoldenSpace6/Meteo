@@ -37,31 +37,6 @@ int estFeuille(pArbre a) {
   return 0;
 }
 
-
-int element(pArbre a) {
-  if(estVide(a)) {
-    return -1;
-  }
-  return a->val;
-}
-int existeFilsGauche(pArbre a) {
-  if(estVide(a)==1) {
-    return 0;
-  }
-  if(a->fg==NULL) {
-    return 0;
-  }
-  return 1;
-}
-int existeFilsDroit(pArbre a) {
-  if(estVide(a)==1) {
-    return 0;
-  }
-  if(a->fd==NULL) {
-    return 0;
-  }
-  return 1;
-}
 void traiter(pArbre a,FILE* out) {
   if(estVide(a)) {
     printf("a est vide");
@@ -85,11 +60,11 @@ void fputsInfixeAcs(pArbre a,FILE* out) {
     fputsInfixeAcs(a->fd, out);
   }
 }
-void fputsInfixeDis(pArbre a,FILE* out) {
+void fputsInfixeDes(pArbre a,FILE* out) {
   if(estVide(a)==0) {
-    fputsInfixeDis(a->fg, out);
+    fputsInfixeDes(a->fg, out);
     traiter(a,out);
-    fputsInfixeDis(a->fd, out);
+    fputsInfixeDes(a->fd, out);
   }
 }
 
