@@ -81,7 +81,7 @@ char line[MAX_LINE_LEN]="";
 int h=0;
 char* temp;
 char* temp2;
-int val;
+long val;
 while (fgets(line, MAX_LINE_LEN, in) != NULL) {
     temp = malloc( (strlen(line) + 1)*sizeof(char) );
     //temp2 = malloc( (strlen(line) + 1)*sizeof(char) );

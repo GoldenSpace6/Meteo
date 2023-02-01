@@ -68,7 +68,7 @@ pArbre equilibrerAVL(pArbre a) {
     }
     return a;
 }
-pArbre insertAVL(pArbre a, int e, char* line, int*h) {
+pArbre insertAVL(pArbre a, long e, char* line, int*h) {
     if(estVide(a)) {
         *h=1;
         return creerArbre(e,line);
@@ -79,6 +79,7 @@ pArbre insertAVL(pArbre a, int e, char* line, int*h) {
     } else if (a->val<e) {
      a->fd=insertAVL(a->fd,e,line,h);
     } else {
+        a->fm=insertAVL(a->fm,e,line,h);
         *h=0;
         return a;
     }

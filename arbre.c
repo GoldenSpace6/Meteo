@@ -2,15 +2,16 @@
 #include <stdlib.h>
 #include <time.h>
 typedef struct arbre {
-  int val;
+  long val;
   int eq;
   char* line;
   struct arbre* fg;
   struct arbre* fd;
+  struct arbre* fm;
 }Arbre;
 typedef Arbre * pArbre;
 //ARBRE
-pArbre creerArbre(int a, char* line) {
+pArbre creerArbre(long a, char* line) {
   pArbre c=malloc(sizeof(Arbre));
   if(c==NULL){
     printf("erreur malloc creerArbre()");
@@ -47,7 +48,7 @@ void traiter(pArbre a,FILE* out) {
 }
 void parcoursPrefixe(pArbre a) {
   if(estVide(a)==0) {
-    printf("%d,",a->val);
+    printf("%ld,",a->val);
     parcoursPrefixe(a->fg);
     parcoursPrefixe(a->fd);
   }
@@ -57,12 +58,14 @@ void fputsInfixeAcs(pArbre a,FILE* out) {
   if(estVide(a)==0) {
     fputsInfixeAcs(a->fg, out);
     traiter(a,out);
+    fputsInfixeAcs(a->fm, out);
     fputsInfixeAcs(a->fd, out);
   }
 }
 void fputsInfixeDes(pArbre a,FILE* out) {
   if(estVide(a)==0) {
     fputsInfixeDes(a->fg, out);
+    fputsInfixeDes(a->fm, out);
     traiter(a,out);
     fputsInfixeDes(a->fd, out);
   }

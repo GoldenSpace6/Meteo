@@ -23,7 +23,7 @@ void ajouteeq(pArbre a) {
   }
 }
 //AVL "/!\"
-pArbre insertABR(pArbre a, int e, char* line) {
+pArbre insertABR(pArbre a, long e, char* line) {
   if(estVide(a)) {
     return creerArbre(e,line);
   }
