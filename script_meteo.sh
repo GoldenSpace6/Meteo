@@ -247,7 +247,7 @@ if (($w == 1));then
     #Station,direction,vitesse,coord
 fi
 if (($h == 1));then 
-    awk -F";" '{print $15,$11}' $ffile > temp.csv
+    awk -F";" '{print $15,$11}' $ffile | awk '!seen[$0]++' > height.csv
     ./CSVsorting -f temp.csv -o sorted_height.dat --$sort -r
     #Height,Coord
 fi
