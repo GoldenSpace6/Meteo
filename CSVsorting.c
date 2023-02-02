@@ -88,10 +88,10 @@ while (fgets(line, MAX_LINE_LEN, in) != NULL) {
     strcpy(temp,line);
     //strcpy(temp2,line);
     //printf("%s\n", temp);
-    temp2=strchr(temp,' ');
+    temp2=strchr(temp,';');
     *temp2='\0';
     val=atoi(temp);
-    *temp2=' ';
+    *temp2=';';
     if(sorting==0) {
         A=insertAVL(A,val,temp,&h);
     } else if(sorting==1) {
