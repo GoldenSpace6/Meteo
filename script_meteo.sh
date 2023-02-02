@@ -38,7 +38,7 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
             w=1;;
         h) #Height
             h=1;;
-        m) #Humidity
+        m) #Moisure
             m=1;;
         F | G | S | A | O | Q) #Region
             region=${option};;
@@ -211,36 +211,62 @@ fi
 case $t in
     1)
         awk -F";" '{print $2,$12,$13,$14}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_temperature1.dat --$sort
+        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
         #Station;moy;min;max
+        awk -F' ' 'BEGIN{test=0; moy=0;nb=1} test!=$1 {print $1" "moy/nb;moy=0;nb=0;} {test=$1;moy+=$2;nb++;} END{printprint $1" "moy/nb}' sorted_tp.dat >sorted_tp.dat
+        #GNUPLOT :
+        gnuplot
+        load 'tp1.p'
+        q
         ;;
     2)
         awk -F";" '{print $1,$12}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_temperature.dat --$sort
-	awk -F' ' 'BEGIN{test=0; moy=0;nb=1} test!=$1 {print moy/nb;moy=0;nb=0;} {test=$1;moy+=$2;nb++; print $1" "$2}' sorted_temperature.dat
+        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
         #Station;moy;min;max
+        #GNUPLOT :
+        gnuplot
+        load 'tp2.p'
+        q
         ;;
     3)
-        awk -F";" '{print $1,$2,$3,$12}' $ffile > temp.csv
-        #./CSVsorting -f temp.csv -o sorted_temperature.dat --$sort
+        awk -F";" '{print $1,$2,$3,$12}' $ffile > temp1.csv
+        ./CSVsorting -f temp1.csv -o temp.dat --$sort
+        awk -F";" '{print $1,$2,$3,$12}' temp1.csv > temp.csv
+        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
         #Date;Station,real Date,moy
+        #GNUPLOT :
+        gnuplot
+        load 'tp3.p'
+        q
         ;;
 esac
 case $p in
     1)
         awk -F";" '{print $2,$4,$8,$9}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_pressure.dat --$sort
+        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
         #Station;mer;pre sta;var
+        #GNUPLOT :
+        gnuplot
+        load 'tp1.p'
+        q
         ;;
     2)
         awk -F";" '{print $1,$8}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_pressure.dat --$sort
+        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
         #Station;pre sta
+        #GNUPLOT :
+        gnuplot
+        load 'tp2.p'
+        q
        ;;
     3)
         awk -F";" '{print $1,$2,$3,$8}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_pressure.dat --$sort
+        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
         #Date;Station,real Date,pre sta
+        #GNUPLOT :
+        gnuplot
+        load 'tp3.p'
+        q
         ;;
 esac
 if (($w == 1));then 
@@ -263,8 +289,8 @@ if (($h == 1));then
 fi
 if (($m == 1));then 
     awk -F";" '{print $7,$11}' $ffile > temp.csv
-    ./CSVsorting -f temp.csv -o sorted_humidity.dat --$sort -r
-    #Humidity,Coord
+    ./CSVsorting -f temp.csv -o sorted_moisture.dat --$sort -r
+    #Moisture,Coord
     #GNUPLOT :
     gnuplot
     load 'm.p'
