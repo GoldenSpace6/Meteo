@@ -75,82 +75,6 @@ if ((t == 0 && p == 0 && w == 0 && h == 0 && m == 0)); then
     echo "Missing option -p -t -w -h or -m, use --help"
     exit 2
 fi
-# ---- Filtering Data ----
-#ffile=$file
-#if [ -n "$d" ] || [ -n "$region" ];then
-#    #Date
-#    if [ -n "$d" ]; then
-#        IFS=","
-#        set -- $d
-#        dmin=$(date -d $1 +%s)
-#        dmax=$(date -d $2 +%s)
-#    fi
-#    #Region
-#    if [ -n "$region" ]; then
-#        case $region in
-#            # Create a Area that contain the whole region
-#            # [minLatitude,maxLatitude,minLongitude,maxLongitude]
-#            F)
-#                Area=(38.5 51.5 -6.5 10.5);;
-#            G)
-#                Area=(1.5 7 -55.5 -51);;
-#            S)
-#                Area=(46 48 -58 -54);;
-#            A)
-#                Area=(9 29 -92 -55);;
-#            O)
-#                Area=(-60 7 20 120);;
-#            Q)
-#                Area=(-90 -60 -180 180);;
-#            *)
-#                echo Error Wrong region
-#                exit 1
-#        esac
-#    fi
-#
-#    head -n1 $file > filtered_meteo.csv
-#    IFS=$'\n'
-#    lm=1
-#    ght=0
-#    loop=$(tail -n+2 $ffile)
-#    for i in $loop;do
-#        IFS=";"
-#        HOLA=(${i})
-#
-#        #echo "$1 ; $2 ; $3 ; $4 ; $5 ; $6 ; $7 ; $8 ; $9 ; ${10}"
-#        save=1
-#        lm=$(( lm + 1 ))
-#
-#        if [ $lm -eq "20" ];then
-#            echo $ght
-#            lm=0
-#            ght=$(( ght + 1 ))
-#        fi
-#        
-#        #Date
-#        if [ -n "$d" ]; then
-#            tempdate=`date -d ${HOLA[1]} +%s`
-#            if (( $tempdate < $dmin || $tempdate > $dmax )); then
-#                save=0
-#            fi
-#        fi
-#        #Region
-#        if [ -n "$region" ] && [ $save -eq 1 ]; then
-#            IFS=","
-#            GPS=(${HOLA[9]})
-#            #GPS=(${HOLA[9]//,/$";"})
-#            #GPS=(${10//,/;}) #replace , by ; then turn it into an array
-#            if [ `echo "${GPS[0]}<${Area[0]}||${GPS[0]}>${Area[1]}||${GPS[1]}<${Area[2]}||${GPS[1]}>${Area[3]}" | bc` = 1 ]; then
-#                save=0
-#            fi
-#        fi
-#        #Write on temporary file
-#        if [ $save -eq 1 ]; then
-#            echo $i >> filtered_meteo.csv
-#        fi
-#    done
-#    ffile="filtered_meteo.csv"
-#fi
 
 # ----------------------------------------------
 # ------------- Filtering Data V2 --------------
@@ -159,12 +83,12 @@ fi
 tail -n+2 $file > titleless_meteo.csv
 echo Removed head
 
-awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > simpledate.csv
+#awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > simpledate.csv
+awk -F";" '{$2=mktime(substr($2,0,4)" "substr($2,6,2)" "substr($2,9,2)" "substr($2,12,2)" 00 00") ; print $0}' datameteo.csv > meteo_data_w_date.csv
 #awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > simpledate.csv
-echo created date
-
-paste -d';' simpledate.csv titleless_meteo.csv > meteo_data_w_date.csv
-echo appended date
+echo Created date
+#paste -d';' simpledate.csv titleless_meteo.csv > meteo_data_w_date.csv
+#echo appended date
 
 ffile="meteo_data_w_date.csv"
 
@@ -172,9 +96,9 @@ ffile="meteo_data_w_date.csv"
 if [ -n "$d" ]; then
     IFS=",-"
     set -- $d
-    dmin=$1$2$3"00"
-    dmax=$4$5$6"00"
-    awk -F";" '$1>'$dmin' && $1<'$dmax' {print $0}' $ffile > filtered_date.csv
+    dmin=$(date -d $1 +%s)
+    dmax=$(date -d $2 +%s)
+    awk -F" " '$2>'$dmin' && $2<'$dmax' {print $0}' $ffile > filtered_date.csv
     ffile="filtered_date.csv"
 fi
 
@@ -200,7 +124,7 @@ if [ -n "$region" ]; then
             exit 1
     esac
 
-    awk -F"[;,]" '$11-('${Area[0]}')>0 && $11-('${Area[1]}')<0 && $12-('${Area[2]}')>0 && $12-('${Area[3]}')<0 {print $0}' $ffile > filtered_area.csv
+    awk -F"[ ,]" '$10-('${Area[0]}')>0 && $10-('${Area[1]}')<0 && $11-('${Area[2]}')>0 && $11-('${Area[3]}')<0 {print $0}' $ffile > filtered_area.csv
     ffile="filtered_area.csv"
 fi
 
@@ -210,30 +134,32 @@ fi
 
 case $t in
     1)
-        awk -F";" '{print $2,$12,$13,$14}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Station;moy;min;max
-        awk -F' ' 'BEGIN{test=0; moy=0;nb=1} test!=$1 {print $1" "moy/nb;moy=0;nb=0;} {test=$1;moy+=$2;nb++;} END{printprint $1" "moy/nb}' sorted_tp.dat >sorted_tp.dat
+        awk -F' ' '{print $1,$11}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        awk -F' ' 'BEGIN{test=0;moy=0;nb=1;min=100;max=-100} test!=$1 {print $1,moy/nb,min,max ;moy=0;nb=0;min$2;max=$2} min>$2 {min=$2} max<$2 {max=$2} {test=$1;moy+=$2;nb++} END{print $1,moy/nb,min,max}' temp2.csv >sorted_tp.dat
+        #Station,moy,min,max
         #GNUPLOT :
         gnuplot
         load 'tp1.p'
         q
         ;;
     2)
-        awk -F";" '{print $1,$12}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Station;moy;min;max
+        awk -F' ' '{print $2,$1,$11}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.dat --$sort
+        #Date,station,moy
+        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$2 {print $2,moy/nb ;moy=0;nb=0} {test=$2;moy+=$3;nb++} END{print $2,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
         gnuplot
         load 'tp2.p'
         q
         ;;
     3)
-        awk -F";" '{print $1,$2,$3,$12}' $ffile > temp1.csv
-        ./CSVsorting -f temp1.csv -o temp.dat --$sort
-        awk -F";" '{print $1,$2,$3,$12}' temp1.csv > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Date;Station,real Date,moy
+        awk -F' ' '{print $2,$1,$11}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        awk -F" " '{print $2,$1,$3}' temp2.csv > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        #Station,date,moy
+        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$1 {print $1,moy/nb ;moy=0;nb=0} {test=$1;moy+=$2;nb++} END{print $1,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
         gnuplot
         load 'tp3.p'
@@ -242,27 +168,34 @@ case $t in
 esac
 case $p in
     1)
-        awk -F";" '{print $2,$4,$8,$9}' $ffile > temp.csv
+        #$3 $8
+        awk -F' ' '{print $1,$7}' $ffile > temp.csv
         ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Station;mer;pre sta;var
+        #Station,mer,pre sta,var
+        awk -F' ' 'BEGIN{test=0;moy=0;nb=1;min=100;max=-100} test!=$1 {print $1,moy/nb,min,max ;moy=0;nb=0;min$2;max=$2} min>$2 {min=$2} max<$2 {max=$2} {test=$1;moy+=$2;nb++} END{print $1,moy/nb,min,max}' temp2.csv >sorted_tp.dat
+        #Station,mer,min,max
         #GNUPLOT :
         gnuplot
         load 'tp1.p'
         q
         ;;
     2)
-        awk -F";" '{print $1,$8}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Station;pre sta
+        awk -F' ' '{print $2,$1,$7}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        #Station,pre sta
+        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$2 {print $2,moy/nb ;moy=0;nb=0} {test=$2;moy+=$3;nb++} END{print $2,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
         gnuplot
         load 'tp2.p'
         q
        ;;
     3)
-        awk -F";" '{print $1,$2,$3,$8}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Date;Station,real Date,pre sta
+        awk -F' ' '{print $2,$1,$7}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        awk -F' ' '{print $2,$1,$3}' temp2.csv > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        #Date,Station,pre sta
+        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$1 {print $1,moy/nb ;moy=0;nb=0} {test=$1;moy+=$2;nb++} END{print $1,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
         gnuplot
         load 'tp3.p'
@@ -270,7 +203,7 @@ case $p in
         ;;
 esac
 if (($w == 1));then 
-    awk -F";" '{print $2,$5,$6,$11}' $ffile > temp.csv
+    awk -F' ' '{print $2,$5,$6,$11}' $ffile > temp.csv
     ./CSVsorting -f temp.csv -o sorted_wind.dat --$sort
     #Station,direction,vitesse,coord
     #GNUPLOT :
@@ -279,7 +212,7 @@ if (($w == 1));then
     q
 fi
 if (($h == 1));then 
-    awk -F";" '{print $15,$11}' $ffile | awk '!seen[$0]++' > height.csv
+    awk -F' ' '{print $15,$11}' $ffile | awk '!seen[$0]++' > height.csv
     ./CSVsorting -f temp.csv -o sorted_height.dat --$sort -r
     #Height,Coord
     #GNUPLOT :
@@ -288,7 +221,7 @@ if (($h == 1));then
     q
 fi
 if (($m == 1));then 
-    awk -F";" '{print $7,$11}' $ffile > temp.csv
+    awk -F' ' '{print $7,$11}' $ffile > temp.csv
     ./CSVsorting -f temp.csv -o sorted_moisture.dat --$sort -r
     #Moisture,Coord
     #GNUPLOT :
@@ -301,6 +234,7 @@ fi
 
 IFS=$OIFS
 rm temp.csv
+rm temp2.csv
 #kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv 
 #kill temperature.csv sorted_temperature.csv pressure.csv sorted_pressure.csv wind.csv sorted_wind.csv height.csv sorted_height.csv humidity.csv sorted_humidity.csv
 # ---- Test ----
