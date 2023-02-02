@@ -264,7 +264,11 @@ fi
 
 IFS=$OIFS
 rm temp.csv
-#kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv 
+rm titleless_meteo.csv
+rm simpledate.csv
+rm meteo_data_w_date.csv
+rm filtered_date.csv filtered_area.csv 
+#kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv
 #kill temperature.csv sorted_temperature.csv pressure.csv sorted_pressure.csv wind.csv sorted_wind.csv height.csv sorted_height.csv humidity.csv sorted_humidity.csv
 # ---- Test ----
 echo "file = $ffile"
