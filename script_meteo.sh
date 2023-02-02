@@ -209,8 +209,8 @@ fi
 
 case $t in
     1)
-        cut $ffile -f2,12,13,14 -d";" > temperature.csv
-        ./CSVsorting -f temperature.csv -o sorted_temperature.csv --$sort
+        cut $ffile -f2,12,13,14 -d";" --output-delimiter=" " > temperature.csv
+        ./CSVsorting -f temperature.csv -o sorted_temperature.dat --$sort
         #Station;moy;min;max
         ;;
     2)
