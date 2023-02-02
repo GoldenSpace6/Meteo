@@ -159,7 +159,8 @@ fi
 tail -n+2 $file > titleless_meteo.csv
 echo Removed head
 
-awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > simpledate.csv
+awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > simpledate.csv
+#awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > simpledate.csv
 echo created date
 
 paste -d';' simpledate.csv titleless_meteo.csv > meteo_data_w_date.csv
@@ -210,12 +211,13 @@ fi
 case $t in
     1)
         awk -F";" '{print $2,$12,$13,$14}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_temperature.dat --$sort
+        ./CSVsorting -f temp.csv -o sorted_temperature1.dat --$sort
         #Station;moy;min;max
         ;;
     2)
         awk -F";" '{print $1,$12}' $ffile > temp.csv
         ./CSVsorting -f temp.csv -o sorted_temperature.dat --$sort
+	awk -F' ' 'BEGIN{test=0; moy=0;nb=1} test!=$1 {print moy/nb;moy=0;nb=0;} {test=$1;moy+=$2;nb++; print $1" "$2}' sorted_temperature.dat
         #Station;moy;min;max
         ;;
     3)
@@ -245,30 +247,35 @@ if (($w == 1));then
     awk -F";" '{print $2,$5,$6,$11}' $ffile > temp.csv
     ./CSVsorting -f temp.csv -o sorted_wind.dat --$sort
     #Station,direction,vitesse,coord
+    #GNUPLOT :
+    gnuplot
+    load 'w.p'
+    q
 fi
 if (($h == 1));then 
     awk -F";" '{print $15,$11}' $ffile | awk '!seen[$0]++' > height.csv
     ./CSVsorting -f temp.csv -o sorted_height.dat --$sort -r
     #Height,Coord
+    #GNUPLOT :
+    gnuplot
+    load 'h.p'
+    q
 fi
 if (($m == 1));then 
     awk -F";" '{print $7,$11}' $ffile > temp.csv
     ./CSVsorting -f temp.csv -o sorted_humidity.dat --$sort -r
     #Humidity,Coord
+    #GNUPLOT :
+    gnuplot
+    load 'm.p'
+    q
 fi
 
-# -------------------------------------------
-# ----------------- GnuPlot -----------------
-# -------------------------------------------
 
 
 IFS=$OIFS
 rm temp.csv
-rm titleless_meteo.csv
-rm simpledate.csv
-rm meteo_data_w_date.csv
-rm filtered_date.csv filtered_area.csv 
-#kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv
+#kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv 
 #kill temperature.csv sorted_temperature.csv pressure.csv sorted_pressure.csv wind.csv sorted_wind.csv height.csv sorted_height.csv humidity.csv sorted_humidity.csv
 # ---- Test ----
 echo "file = $ffile"
