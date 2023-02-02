@@ -37,6 +37,24 @@ int estFeuille(pArbre a) {
   }
   return 0;
 }
+int existeFilsGauche(pArbre a) {
+  if(estVide(a)==1) {
+    return 0;
+  }
+  if(a->fg==NULL) {
+    return 0;
+  }
+  return 1;
+}
+int existeFilsDroit(pArbre a) {
+  if(estVide(a)==1) {
+    return 0;
+  }
+  if(a->fd==NULL) {
+    return 0;
+  }
+  return 1;
+}
 
 void traiter(pArbre a,FILE* out) {
   if(estVide(a)) {
