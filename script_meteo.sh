@@ -59,12 +59,12 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
                 help) #Help
                     echo 'exit 1 > inpropper use of option \n exit 2 > missing option \n
 					-f file Inputed must be a csv\n
-                    
+					\n
 					--------- Graph type -----------\n
 					-t1 Generate a Graph with each station having a min, max and a average of the temperature\n
 					-t2 Generate a Graph with hour having a average of the temperature\n
 					-t3 Does nott work\n
-					
+					\n
 					-p1 Generate a Graph with each station having a min, max and a average of the pressure\n
 					-p2 Generate a Graph with hour having a average of the pressure\n
 					-p3 Does not work\n 
