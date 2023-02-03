@@ -8,7 +8,11 @@ sort="avl"
 
 OIFS=$IFS
 # Compile C
-gcc main.c -o CSVsorting
+cd sort
+make
+make clean
+mv CSVsorting ../
+cd ../
 # ---- Checking and saving option ----
 while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
