@@ -221,7 +221,7 @@ if (($h == 1));then
     q
 fi
 if (($m == 1));then 
-    awk -F' ' '{print $7,$11}' $ffile > temp.csv
+    awk -F' ' '$7!="" {print $7,$11}' $ffile > temp.csv
     ./CSVsorting -f temp.csv -o sorted_moisture.dat --$sort -r
     #Moisture,Coord
     #GNUPLOT :
