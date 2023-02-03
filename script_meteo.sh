@@ -7,6 +7,8 @@ w=0
 sort="avl"
 
 OIFS=$IFS
+# Compile C
+gcc main.c -o CSVsorting
 # ---- Checking and saving option ----
 while getopts "f:t:p:whmFGSAOQd:-:" option; do
     case "${option}" in
@@ -84,7 +86,7 @@ tail -n+2 $file > titleless_meteo.csv
 echo Removed head
 
 #awk -F"[;T]" '{system("date -d "$2" +%s")+substr($3,0,2)*3600}' titleless_meteo.csv > simpledate.csv
-awk -F";" '{$2=mktime(substr($2,0,4)" "substr($2,6,2)" "substr($2,9,2)" "substr($2,12,2)" 00 00") ; print $0}' datameteo.csv > meteo_data_w_date.csv
+awk -F";" '{temp=$2; $2=mktime(substr($2,0,4)" "substr($2,6,2)" "substr($2,9,2)" "substr($2,12,2)" 00 00") ; print $0,temp}' titleless_meteo.csv > meteo_data_w_date.csv
 #awk -F"[;T:-]" '{print $2$3$4$5}' titleless_meteo.csv > simpledate.csv
 echo Created date
 #paste -d';' simpledate.csv titleless_meteo.csv > meteo_data_w_date.csv
@@ -131,119 +133,104 @@ fi
 # -------------------------------------------
 # ----------------- Sorting -----------------
 # -------------------------------------------
-
+tr ' ' ';' <$ffile > temp3.csv
+ffile="temp3.csv"
 case $t in
     1)
-        awk -F' ' '{print $1,$11}' $ffile > temp.csv
+        awk -F';' '{print $1,$11}' $ffile > temp.csv
         ./CSVsorting -f temp.csv -o temp2.csv --$sort
-        awk -F' ' 'BEGIN{test=0;moy=0;nb=1;min=100;max=-100} test!=$1 {print $1,moy/nb,min,max ;moy=0;nb=0;min$2;max=$2} min>$2 {min=$2} max<$2 {max=$2} {test=$1;moy+=$2;nb++} END{print $1,moy/nb,min,max}' temp2.csv >sorted_tp.dat
+        awk -F' ' '$2!="" {print $0}' temp2.csv > temp.csv
+        awk -F' ' 'BEGIN{prev="";moy=0;nb=0;min=100;max=-100} prev!=""&&prev!=$1 {print $1,moy/nb,min,max ;moy=0;nb=0;min=$2;max=$2} min>$2 {min=$2} max<$2 {max=$2} {prev=$1;moy+=$2;nb++} END{print $1,moy/nb,min,max}' temp.csv >sorted_tp.dat
         #Station,moy,min,max
         #GNUPLOT :
-        gnuplot
-        load 'tp1.p'
-        q
+        gnuplot --persist GNU/tp1.p 
         ;;
     2)
-        awk -F' ' '{print $2,$1,$11}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o temp2.dat --$sort
-        #Date,station,moy
-        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$2 {print $2,moy/nb ;moy=0;nb=0} {test=$2;moy+=$3;nb++} END{print $2,moy/nb}' temp2.csv >sorted_tp.dat
+        awk -F';' '{print $2,$11}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        #Date,moy
+        awk -F' ' 'BEGIN{prev="";moy=0;nb=0} prev!=""&&prev!=$1 {print $1,moy/nb ;moy=0;nb=0} {prev=$1;moy+=$2;nb++} END{print $1,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
-        gnuplot
-        load 'tp2.p'
-        q
+        gnuplot --persist GNU/tp2.p 
         ;;
     3)
-        awk -F' ' '{print $2,$1,$11}' $ffile > temp.csv
+        awk -F';' '{print $2,$1,$11}' $ffile > temp.csv
         ./CSVsorting -f temp.csv -o temp2.csv --$sort
-        awk -F" " '{print $2,$1,$3}' temp2.csv > temp.csv
+        awk -F' ' '{print $2,$1,$3}' temp2.csv > temp.csv
         ./CSVsorting -f temp.csv -o temp2.csv --$sort
         #Station,date,moy
-        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$1 {print $1,moy/nb ;moy=0;nb=0} {test=$1;moy+=$2;nb++} END{print $1,moy/nb}' temp2.csv >sorted_tp.dat
+        awk -F' ' 'BEGIN{prev="";moy=0;nb=0} prev!=""&&prev!=$1 {print $1,$2,moy/nb ;moy=0;nb=0} {prev=$1;moy+=$3;nb++} END{print $1,$2,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
-        gnuplot
-        load 'tp3.p'
-        q
+        #gnuplot --persist GNU/tp3.p 
         ;;
 esac
 case $p in
     1)
-        #$3 $8
-        awk -F' ' '{print $1,$7}' $ffile > temp.csv
-        ./CSVsorting -f temp.csv -o sorted_tp.dat --$sort
-        #Station,mer,pre sta,var
-        awk -F' ' 'BEGIN{test=0;moy=0;nb=1;min=100;max=-100} test!=$1 {print $1,moy/nb,min,max ;moy=0;nb=0;min$2;max=$2} min>$2 {min=$2} max<$2 {max=$2} {test=$1;moy+=$2;nb++} END{print $1,moy/nb,min,max}' temp2.csv >sorted_tp.dat
-        #Station,mer,min,max
+        awk -F';' '{print $1,$7}' $ffile > temp.csv
+        ./CSVsorting -f temp.csv -o temp2.csv --$sort
+        awk -F' ' '$2!="" {print $0}' temp2.csv > temp.csv
+        awk -F' ' 'BEGIN{prev="";moy=0;nb=0;min=100;max=-100} prev!=""&&prev!=$1 {print $1,moy/nb,min,max ;moy=0;nb=0;min=$2;max=$2} min>$2 {min=$2} max<$2 {max=$2} {prev=$1;moy+=$2;nb++} END{print $1,moy/nb,min,max}' temp.csv >sorted_tp.dat
+        #Station,moy,min,max
         #GNUPLOT :
-        gnuplot
-        load 'tp1.p'
-        q
+        gnuplot --persist GNU/tp1.p 
         ;;
     2)
-        awk -F' ' '{print $2,$1,$7}' $ffile > temp.csv
+        awk -F';' '{print $2,$7}' $ffile > temp.csv
         ./CSVsorting -f temp.csv -o temp2.csv --$sort
-        #Station,pre sta
-        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$2 {print $2,moy/nb ;moy=0;nb=0} {test=$2;moy+=$3;nb++} END{print $2,moy/nb}' temp2.csv >sorted_tp.dat
+        #Date,pressure
+        awk -F' ' 'BEGIN{prev="";moy=0;nb=0} prev!=""&&prev!=$1 {print $1,moy/nb ;moy=0;nb=0} {prev=$1;moy+=$2;nb++} END{print $1,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
-        gnuplot
-        load 'tp2.p'
-        q
-       ;;
+        gnuplot --persist GNU/tp2.p 
+        ;;
     3)
-        awk -F' ' '{print $2,$1,$7}' $ffile > temp.csv
+        awk -F';' '{print $2,$1,$7}' $ffile > temp.csv
         ./CSVsorting -f temp.csv -o temp2.csv --$sort
         awk -F' ' '{print $2,$1,$3}' temp2.csv > temp.csv
         ./CSVsorting -f temp.csv -o temp2.csv --$sort
-        #Date,Station,pre sta
-        awk -F' ' 'BEGIN{test=0;moy=0;nb=1} test!=$1 {print $1,moy/nb ;moy=0;nb=0} {test=$1;moy+=$2;nb++} END{print $1,moy/nb}' temp2.csv >sorted_tp.dat
+        #Station,date,moy
+        awk -F' ' 'BEGIN{prev="";moy=0;nb=0} prev!=""&&prev!=$1 {print $1,$2,moy/nb ;moy=0;nb=0} {prev=$1;moy+=$3;nb++} END{print $1,$2,moy/nb}' temp2.csv >sorted_tp.dat
         #GNUPLOT :
-        gnuplot
-        load 'tp3.p'
-        q
+        #gnuplot --persist GNU/tp3.p 
         ;;
 esac
 if (($w == 1));then 
-    awk -F' ' '{print $2,$5,$6,$11}' $ffile > temp.csv
-    ./CSVsorting -f temp.csv -o sorted_wind.dat --$sort
+    awk -F';' '{print $1,$4,$5,$10}' $ffile > temp.csv
+    #awk -F' ' 'BEGIN{prev="";moy=0;nb=1} prev!=""&&prev!=$1 {print $1,moy/nb ;moy=0;nb=0} {prev=$1;moy+=$2;nb++} END{print $1,moy/nb}' 
+    ./CSVsorting -f temp.csv -o temp2.csv --$sort
+    awk -F' ' 'BEGIN{prev="";moy_lat=0;moy_long=0;nb=0} prev!=""&&prev!=$1 {print $1,moy_lat/nb,moy_long/nb,$4 ;moy_lat=0;moy_long=0;nb=0} {prev=$1;moy_long-=sin($2)*$3;moy_lat-=cos($2)*$3;nb++} END{print $1,moy_lat/nb,moy_long/nb,$4 ;moy_lat=0;moy_long=0;nb=0}' temp2.csv > sorted_wind.dat
     #Station,direction,vitesse,coord
+    #Station,dx,dy,coord
     #GNUPLOT :
-    gnuplot
-    load 'w.p'
-    q
+    gnuplot --persist GNU/w.p 
 fi
 if (($h == 1));then 
-    awk -F' ' '{print $15,$11}' $ffile | awk '!seen[$0]++' > height.csv
+    awk -F';' '{print $14,$10}' $ffile | awk '!seen[$0]++' > temp.csv
     ./CSVsorting -f temp.csv -o sorted_height.dat --$sort -r
     #Height,Coord
     #GNUPLOT :
-    gnuplot
-    load 'h.p'
-    q
+    gnuplot --persist GNU/h.p 
 fi
 if (($m == 1));then 
-    awk -F' ' '$7!="" {print $7,$11}' $ffile > temp.csv
-    ./CSVsorting -f temp.csv -o sorted_moisture.dat --$sort -r
+    awk -F';' '$6!="" {print $6,$10}' $ffile | awk '!seen[$0]++' > temp.csv
+    ./CSVsorting -f temp.csv -o temp2.csv --$sort -r
+    awk -F';' '{print $1}' temp2.csv > sorted_moisture.dat
+
     #Moisture,Coord
     #GNUPLOT :
-    gnuplot
-    load 'm.p'
-    q
+    gnuplot --persist GNU/m.p 
 fi
 
 
 
 IFS=$OIFS
+rm meteo_data_w_date.csv
 rm temp.csv
 rm temp2.csv
+rm temp3.csv
+rm sorted_temperature.dat
+rm sorted_pressure.dat
+rm sorted_wind.dat
+rm sorted_height.dat
+rm sorted_moisture.dat
 #kill titleless_meteo.csv simpledate.csv meteo_data_w_date.csv filtered_date.csv filtered_area.csv 
 #kill temperature.csv sorted_temperature.csv pressure.csv sorted_pressure.csv wind.csv sorted_wind.csv height.csv sorted_height.csv humidity.csv sorted_humidity.csv
-# ---- Test ----
-echo "file = $ffile"
-echo "p = $p"
-echo "t = $t"
-echo "h = $h"
-echo "w = $w"
-echo "m = $m"
-echo "region = $region"
-echo "dmin = $dmin , dmax = $dmax"
-echo "sort = $sort"

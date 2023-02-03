@@ -1,31 +1,93 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "arbre.c"
-int recherche(pArbre a, int e) {
-  if(estVide(a)) {
+#include <time.h>
+//#include "ABR.h"
+typedef struct arbre {
+  long val;
+  int eq;
+  char* line;
+  struct arbre* fg;
+  struct arbre* fd;
+  struct arbre* fm;
+}Arbre;
+typedef Arbre * pArbre;
+//TREE
+pArbre createTree(long a, char* line) {
+  pArbre c=malloc(sizeof(Arbre));
+  if(c==NULL){
+    printf("erreur malloc createTree()");
+    exit(1);
+  }
+  c->val=a;
+  c->line=line;
+  c->eq=0;
+  c->fg=NULL;
+  c->fd=NULL;
+  return c;
+}
+typedef Arbre * pArbre;
+
+int isLeftChild(pArbre a) {
+  if(a==NULL) {
+    return 0;
+  }
+  if(a->fg==NULL) {
+    return 0;
+  }
+  return 1;
+}
+int isRightChild(pArbre a) {
+  if(a==NULL) {
+    return 0;
+  }
+  if(a->fd==NULL) {
+    return 0;
+  }
+  return 1;
+}
+
+void process(pArbre a,FILE* out) {
+  if(a==NULL) {
+    printf("a est vide");
+    exit(4);
+  } else {
+    fputs(a->line,out);
+  }
+}
+
+void fputsInfixeAcs(pArbre a,FILE* out) {
+  if(a!=NULL) {
+    fputsInfixeAcs(a->fg, out);
+    process(a,out);
+    fputsInfixeAcs(a->fm, out);
+    fputsInfixeAcs(a->fd, out);
+  }
+}
+void fputsInfixeDes(pArbre a,FILE* out) {
+  if(a!=NULL) {
+    fputsInfixeDes(a->fg, out);
+    fputsInfixeDes(a->fm, out);
+    process(a,out);
+    fputsInfixeDes(a->fd, out);
+  }
+}
+// ABR
+int search(pArbre a, int e) {
+  if(a==NULL) {
     return 0;
   }
   if(a->val==e) {
     return 1;
   }
   if (a->val>e) {
-    return recherche(a->fg,e);
+    return search(a->fg,e);
   } else {
-    return recherche(a->fd,e);
+    return search(a->fd,e);
   }
 }
-//AVL "/!\"
-void ajouteeq(pArbre a) {
-  if(estVide(a)==0) {
-    a->eq=hauteur(a->fd)-hauteur(a->fg);
-    ajouteeq(a->fg);
-    ajouteeq(a->fd);
-  }
-}
-//AVL "/!\"
 pArbre insertABR(pArbre a, long e, char* line) {
-  if(estVide(a)) {
-    return creerArbre(e,line);
+  if(a==NULL) {
+    return createTree(e,line);
   }
   if(a->val==e) {
     return a;
@@ -37,61 +99,4 @@ pArbre insertABR(pArbre a, long e, char* line) {
   }
   return a;
 }
-pArbre remplacerRacine(pArbre a) {
-  pArbre tempPere=a;
-  pArbre temp=a->fg;
-  while(existeFilsDroit(temp)) {
-    tempPere=temp;
-    temp=temp->fd;
-  }
-  if(tempPere!=a) {
-    tempPere->fd=temp->fg;
-    temp->fg=a->fg;
-  }
- temp->fd=a->fd;
-  return temp;
-}
-pArbre suppressionRacine(pArbre a) {
-  pArbre ret=NULL;
-  if(estFeuille(a)) {
-    ret= NULL;
-  }else if(existeFilsDroit(a) && existeFilsGauche(a)==0) {
-    ret=a->fd;
-  }else if(existeFilsDroit(a)==0 && existeFilsGauche(a)) {
-    ret=a->fg;
-  }else {
-    ret = remplacerRacine(a);
-  }
-  //ret->eq=hauteur(ret->fd)-hauteur(ret->fg);
 
-  ajouteeq(ret);
-  free(a);
-  return ret;
-}
-pArbre suppressionElmt(pArbre a,int e) {
-  if(estVide(a)) {
-    return NULL;
-  }
-  if(a->val==e) {
-    return suppressionRacine(a);
-  }
-  if (a->val>e) {
-    a->fg=suppressionElmt(a->fg,e);
-  } else {
-    a->fd=suppressionElmt(a->fd,e);
-  }
-  ajouteeq(a);
-  return a;
-
-}
-
-pArbre oldMain2() {
-  //oldMain();
-  pArbre temp = NULL;
-  int tab[9]={10, 3, 5, 15, 20, 12, 7, 45, 9};
-  for(int i=0;i<9;i++) {
-    temp=insertABR(temp,tab[i],NULL);
-  }
-  //suppressionElmt(temp,15);
-  //parcoursInfixe(temp);
-}
