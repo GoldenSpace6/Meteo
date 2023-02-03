@@ -1,11 +1,12 @@
 CC=gcc
+CPATH=.
 OPTION=-Wall -lm
 RM=rm -rf	# force la suppression
 SRC=$(wildcard *.c) # fichiers source par wildcard dans srcdir
 HEAD=$(wildcard *.h) # fichiers d'entete idem
 OBJ=$(SRC:.c=.o)  # fichiers objet par récupération des .c 
 				  # et placement dans les bon répertoires
-PROG=abr # exécutables
+PROG=CSVsorting # exécutables
 
 all : $(PROG)		# target principal
 

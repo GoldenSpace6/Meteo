@@ -1,16 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-//#include "ABR.h"
-typedef struct arbre {
-  long val;
-  int eq;
-  char* line;
-  struct arbre* fg;
-  struct arbre* fd;
-  struct arbre* fm;
-}Arbre;
-typedef Arbre * pArbre;
+#include "ABR.h"
 //TREE
 pArbre createTree(long a, char* line) {
   pArbre c=malloc(sizeof(Arbre));

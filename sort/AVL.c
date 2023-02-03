@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <AVL.h>
-#include "ABR.c"
+#include "AVL.h"
+//#include "ABR.c"
 
 int eq(pArbre a) {
     if(a==NULL) {
