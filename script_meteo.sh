@@ -53,8 +53,35 @@ while getopts "f:t:p:whmFGSAOQd:-:" option; do
         -)
             case "${OPTARG}" in
                 help) #Help
-                    echo "exit 1 > inpropper use of option
-exit 2 > missing option"
+                    echo 'exit 1 > inpropper use of option \n exit 2 > missing option \n
+					-f file Inputed must be a csv\n
+                    
+					--------- Graph type -----------\n
+					-t1 Generate a Graph with each station having a min, max and a average of the temperature\n
+					-t2 Generate a Graph with hour having a average of the temperature\n
+					-t3 Does nott work\n
+					
+					-p1 Generate a Graph with each station having a min, max and a average of the pressure\n
+					-p2 Generate a Graph with hour having a average of the pressure\n
+					-p3 Does not work\n 
+					\n
+					-w Generate a Graph of each station with their average wind direction\n
+					\n
+					-h Generate a Graph of each station with their height\n
+					\n
+					-m Generate a Graph of each station with their moisture\n
+					--------- Filtering -----------\n
+					-d yyyy-mm-dd,YYYY-MM-DD Remove Value that are not contain between yyyy-mm-dd and YYYY-MM-DD\n
+					-g m,M Remove Value that do not have longitute between m and M\n
+					-a m,M Remove Value that do not have latitude between m and M\n
+					-A -Z
+					--------- Sorting Method -----------\n
+                    --tab Does not work\n
+                    --ABR sort data using ABR sorting\n
+                    --AVL sort data using AVL sorting\n
+                    
+                    --help show this\n
+					'
                     exit 0;;
                 tab | avl | abr) #Sorting Algorithme
                     sort=${OPTARG};;
