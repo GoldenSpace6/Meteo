@@ -28,9 +28,16 @@ At least one graph option must be use and a file must be precise with -f
 					-a m,M Remove Value that do not have latitude between m and M\n
 					-A -Z
 					--------- Sorting Method -----------\n
-          --tab does not work
-          --avl sort using AVL method
-          --avl sort using ABR method
+					--tab does not work
+					--avl sort using AVL method
+					--avl sort using ABR method
           
-          exit 1 > inpropper use of option
-          exit 2 > missing option
+					exit 1 > inpropper use of option
+					exit 2 > missing option
+					
+----- C File
+
+To compile the c file go to sort/ directoty and launch make.
+a executable named CSVsorting will be created.
+CSVsorting require -f namefile for the file to be sorted and -o filename for the sorted file
+CSVsorting can use --tab --avl --abr for which sorting method and -r to reverse the output
